@@ -6,35 +6,36 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <link rel="icon" type="image/jpeg" href="inbox/logo.jpg">
-  <link rel="stylesheet" href="inbox/vue.css">
+  <link rel="icon" type="image/jpeg" href="./inbox/logo.jpg">
+  <link rel="stylesheet" href="./inbox/vue.css">
 </head>
 <body>
   <div id="app"></div>
+
   <script>
     window.$docsify = {
       loadSidebar: true,
-      routerMode: 'hash',
       loadNavbar: true,
-    notFoundPage: '/_404.md',
-    plugins: [
-      function (hook) {
-        hook.doneEach(function () {
-          const marker = document.getElementById('docsify-404-redirect');
-          if (!marker) return;
+      routerMode: 'hash',
+      notFoundPage: './_404.md',
+      plugins: [
+        function (hook) {
+          hook.doneEach(function () {
+            const marker = document.getElementById('docsify-404-redirect');
+            if (!marker) return;
 
-          const target = marker.dataset.target || '/404.html';
-          const from = encodeURIComponent(location.hash || '#/');
-          location.replace(target + '?from=' + from);
-        });
-      }
-    ]
-    }
+            const target = marker.dataset.target || './404.html';
+            const from = encodeURIComponent(location.hash || '#/');
+            location.replace(target + '?from=' + from);
+          });
+        }
+      ]
+    };
   </script>
-  <!-- Docsify v4 -->
-  <script src="inbox/loader.js"></script>
-  <script src="inbox/docsify.min.js"></script>
-  <script src="inbox/search.min.js"></script>
-  <script src="inbox/emojiCursor.js"></script>
+
+  <script src="./inbox/loader.js"></script>
+  <script src="./inbox/docsify.min.js"></script>
+  <script src="./inbox/search.min.js"></script>
+  <script src="./inbox/emojiCursor.js"></script>
 </body>
 </html>
