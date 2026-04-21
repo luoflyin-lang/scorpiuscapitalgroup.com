@@ -2,8 +2,8 @@
 
 > 美西｜加州 369-3333321  
 > 美东｜纽约 929-2777776  
-> 电子邮箱：support@scorpiuscapitalgroup.com
-> 地址：1209 Mountain Road Pl NE, Ste N, Albuquerque, NM 87110, USA
+> 电子邮箱：support@scorpiuscapitalgroup.com  
+> 地址：1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM, 87110, United States  
 
 <hr />
 <footer>
