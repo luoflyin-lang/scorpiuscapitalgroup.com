@@ -1,3 +1,2 @@
-- [年度预测报告](documents/A00/)
-  - [2026](documents/FC/FC2026.md)
-  - [2027](documents/FC/FC2027.md)
+- [年度预测报告](/documents/FC/)
+  - [2026](/documents/FC/FC2026.md)
