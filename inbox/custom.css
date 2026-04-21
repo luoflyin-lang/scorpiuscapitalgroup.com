@@ -1,0 +1,41 @@
+/* 全站基础字体 */
+body,
+.sidebar,
+.sidebar-nav,
+.app-name,
+.content,
+.markdown-section,
+.markdown-section p,
+.markdown-section li,
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3,
+.markdown-section h4,
+.markdown-section h5,
+.markdown-section h6,
+.search input,
+.navbar,
+a,
+button,
+input,
+textarea,
+select {
+  font-family: "Source Sans 3", "Source Han Sans SC", "思源黑体 SC", sans-serif !important;
+}
+
+/* 正文更稳一点 */
+body,
+.markdown-section,
+.sidebar {
+  font-weight: 500;
+}
+
+/* 标题和导航更有机构感 */
+.app-name,
+.sidebar-nav a,
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3,
+.navbar a {
+  font-weight: 600;
+}
