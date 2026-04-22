@@ -7,8 +7,8 @@
     // 只影响“动画观感”，不会影响真实资源下载速度
     // 想更有“加载感”就把 minTime 再加一点，比如 600~700
     // 想更利落就降到 350~450
-    minTime: 520,
-    ghostTime: 120,
+    minTime: 360,
+    ghostTime: 60,
     trickleMax: 94,
     autoStart: true
   }, global.$docsifyScorpiusLoader || {});
@@ -240,14 +240,13 @@
     state.status = 'finishing';
     clearTimers();
     renderProgress(100);
-    state.preloader.classList.add('isdone');
-
     var elapsed = performance.now() - state.startTime;
-    var finishDelay = Math.max(options.ghostTime, Math.max(options.minTime - elapsed, 0));
+    var finishDelay = Math.min(options.ghostTime, Math.max(options.minTime - elapsed, 0));
 
     state.finishTimer = setTimeout(function () {
       state.pace.classList.remove('pace-active');
       state.pace.classList.add('pace-inactive');
+      state.preloader.classList.add('isdone');
       setBodyRunning(false);
       state.status = 'idle';
       state.initialDone = true;

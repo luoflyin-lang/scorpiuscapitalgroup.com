@@ -12,18 +12,21 @@
     var style = document.createElement('style');
     style.id = 'scg-custom-layout-style';
     style.textContent = [
-      '.content { min-height: 100vh; }',
+      '.content {',
+      '  min-height: 100vh;',
+      '  display: flex;',
+      '}',
+      '.markdown-section#main {',
+      '  flex: 1 1 auto;',
+      '}',
       '.markdown-section {',
-      '  min-height: calc(100vh - 120px);',
       '  display: flex;',
       '  flex-direction: column;',
+      '  min-height: 100%;',
       '}',
       '.markdown-section > footer {',
       '  margin-top: auto;',
-      '  padding-top: 28px;',
-      '}',
-      '@media screen and (max-width: 768px) {',
-      '  .markdown-section { min-height: calc(100vh - 72px); }',
+      '  padding-top: 32px;',
       '}'
     ].join('\n');
     document.head.appendChild(style);
