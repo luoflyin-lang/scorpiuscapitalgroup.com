@@ -4,18 +4,14 @@
   var global = window;
   var docsify = global.$docsify = global.$docsify || {};
   var options = Object.assign({
-    // 只影响“动画观感”，不会影响真实资源下载速度
-    // 想更有“加载感”就把 minTime 再加一点，比如 600~700
-    // 想更利落就降到 350~450
-    minTime: 360,
-    ghostTime: 60,
-    trickleMax: 94,
+    minTime: 250,
+    ghostTime: 100,
+    trickleMax: 92,
     autoStart: true
   }, global.$docsifyScorpiusLoader || {});
 
   var state = {
     bootstrapped: false,
-    initialDone: false,
     status: 'idle',
     progress: 0,
     startTime: 0,
@@ -37,34 +33,39 @@
     '  user-select: none;',
     '  z-index: 99999999999999;',
     '  position: fixed;',
+    '  margin: auto;',
     '  top: 0;',
     '  left: 0;',
     '  right: 0;',
-    '  width: 100vw;',
+    '  bottom: 0;',
+    '  width: 400px;',
     '  border: 0;',
-    '  height: 3px;',
+    '  height: 1px;',
     '  overflow: hidden;',
-    '  background: rgba(198, 169, 107, 0.16);',
-    '  -webkit-transition: opacity 0.28s ease;',
-    '  -o-transition: opacity 0.28s ease;',
-    '  transition: opacity 0.28s ease;',
+    '  background: rgba(212, 184, 120, 0.16)',
+    '  -webkit-transition: all 1s;',
+    '  -o-transition: all 1s;',
+    '  transition: all 1s;',
     '}',
     '.pace .pace-progress {',
+    '  -webkit-transform: translate3d(0, 0, 0);',
+    '  transform: translate3d(0, 0, 0);',
+    '  max-width: 300px;',
     '  z-index: 99999999999999;',
     '  display: block;',
     '  position: absolute;',
     '  top: 0;',
-    '  left: 0;',
+    '  right: 100%;',
     '  height: 100%;',
-    '  width: 0%;',
+    '  width: 100%;',
     '  background: #c6a96b;',
-    '  box-shadow: 0 0 12px rgba(198, 169, 107, 0.35);',
-    '  -webkit-transition: width 0.12s linear;',
-    '  -o-transition: width 0.12s linear;',
-    '  transition: width 0.12s linear;',
     '}',
     '.pace.pace-inactive {',
+    '  width: 100vw;',
     '  opacity: 0;',
+    '}',
+    '.pace.pace-inactive .pace-progress {',
+    '  max-width: 100vw;',
     '}',
     '#preloader {',
     '  width: 100%;',
@@ -90,19 +91,19 @@
     '#preloader:after { bottom: 0; }',
     '#preloader.isdone {',
     '  visibility: hidden;',
-    '  -webkit-transition-delay: 0s;',
-    '  -o-transition-delay: 0s;',
-    '  transition-delay: 0s;',
+    '  -webkit-transition-delay: 1.5s;',
+    '  -o-transition-delay: 1.5s;',
+    '  transition-delay: 1.5s;',
     '}',
     '#preloader.isdone:after,',
     '#preloader.isdone:before {',
     '  height: 0;',
-    '  -webkit-transition: all 0.42s cubic-bezier(1, 0, 0.55, 1);',
-    '  -o-transition: all 0.42s cubic-bezier(1, 0, 0.55, 1);',
-    '  transition: all 0.42s cubic-bezier(1, 0, 0.55, 1);',
-    '  -webkit-transition-delay: 0s;',
-    '  -o-transition-delay: 0s;',
-    '  transition-delay: 0s;',
+    '  -webkit-transition: all 0.7s cubic-bezier(1, 0, 0.55, 1);',
+    '  -o-transition: all 0.7s cubic-bezier(1, 0, 0.55, 1);',
+    '  transition: all 0.7s cubic-bezier(1, 0, 0.55, 1);',
+    '  -webkit-transition-delay: 1s;',
+    '  -o-transition-delay: 1s;',
+    '  transition-delay: 1s;',
     '}',
     '.loading-text {',
     '  font-size: 40px;',
@@ -121,15 +122,15 @@
     '.loading-text.isdone {',
     '  top: 50%;',
     '  opacity: 0;',
-    '  -webkit-transition: all 0.32s cubic-bezier(0.19, 1, 0.22, 1);',
-    '  -o-transition: all 0.32s cubic-bezier(0.19, 1, 0.22, 1);',
-    '  transition: all 0.32s cubic-bezier(0.19, 1, 0.22, 1);',
-    '  -webkit-transition-delay: 0s;',
-    '  -o-transition-delay: 0s;',
-    '  transition-delay: 0s;',
+    '  -webkit-transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);',
+    '  -o-transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);',
+    '  transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);',
+    '  -webkit-transition-delay: .5s;',
+    '  -o-transition-delay: .5s;',
+    '  transition-delay: .5s;',
     '}',
     '@media (max-width: 480px) {',
-    '  .pace { height: 2px; }',
+    '  .pace { width: calc(100vw - 48px); }',
     '}'
   ].join('\n');
 
@@ -171,9 +172,11 @@
   function renderProgress(value) {
     state.progress = Math.max(0, Math.min(100, value));
     if (!state.paceProgress) return;
-    state.paceProgress.style.width = state.progress + '%';
+    var transform = 'translate3d(' + state.progress + '%, 0, 0)';
+    state.paceProgress.style.webkitTransform = transform;
+    state.paceProgress.style.msTransform = transform;
+    state.paceProgress.style.transform = transform;
     state.paceProgress.setAttribute('data-progress-text', (state.progress | 0) + '%');
-
     var display = state.progress >= 100 ? '99' : (state.progress < 10 ? '0' : '') + (state.progress | 0);
     state.paceProgress.setAttribute('data-progress', display);
   }
@@ -198,12 +201,10 @@
 
     var p = state.progress;
     var inc;
-
-    // 视觉上慢一点，但不阻塞真实加载
-    if (p < 10) inc = dt * 0.12;
-    else if (p < 28) inc = dt * 0.075;
-    else if (p < 55) inc = dt * 0.038;
-    else if (p < 78) inc = dt * 0.017;
+    if (p < 12) inc = dt * 0.18;
+    else if (p < 35) inc = dt * 0.09;
+    else if (p < 60) inc = dt * 0.04;
+    else if (p < 80) inc = dt * 0.018;
     else inc = dt * 0.006;
 
     renderProgress(Math.min(options.trickleMax, p + inc));
@@ -211,9 +212,6 @@
   }
 
   function start() {
-    // 只允许首次进入站点时跑一次
-    if (state.initialDone || state.status === 'running' || state.status === 'finishing') return;
-
     injectStyle();
     ensureDom();
     if (!state.preloader || !state.pace || !state.paceProgress) return;
@@ -226,10 +224,8 @@
     state.preloader.classList.remove('isdone');
     state.pace.classList.remove('pace-inactive');
     state.pace.classList.add('pace-active');
-
     setBodyRunning(true);
     renderProgress(0);
-
     state.rafId = requestAnimationFrame(tick);
   }
 
@@ -240,26 +236,24 @@
     state.status = 'finishing';
     clearTimers();
     renderProgress(100);
+    state.preloader.classList.add('isdone');
+
     var elapsed = performance.now() - state.startTime;
-    var finishDelay = Math.min(options.ghostTime, Math.max(options.minTime - elapsed, 0));
+    var finishDelay = Math.max(options.ghostTime, Math.max(options.minTime - elapsed, 0));
 
     state.finishTimer = setTimeout(function () {
       state.pace.classList.remove('pace-active');
       state.pace.classList.add('pace-inactive');
-      state.preloader.classList.add('isdone');
       setBodyRunning(false);
       state.status = 'idle';
-      state.initialDone = true;
     }, finishDelay);
   }
 
   function bootstrap() {
     if (state.bootstrapped) return;
     state.bootstrapped = true;
-
     injectStyle();
     ensureDom();
-
     if (options.autoStart) start();
   }
 
@@ -274,12 +268,13 @@
       bootstrap();
     });
 
-    // 这里只在首次加载完成时结束一次
-    // 不再在站内切换页面时重新 start()
+    hook.beforeEach(function (content) {
+      start();
+      return content;
+    });
+
     hook.doneEach(function () {
-      if (!state.initialDone) {
-        finish();
-      }
+      finish();
     });
   }
 
