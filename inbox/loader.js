@@ -7,8 +7,8 @@
     // 只影响“动画观感”，不会影响真实资源下载速度
     // 想更有“加载感”就把 minTime 再加一点，比如 600~700
     // 想更利落就降到 350~450
-    minTime: 650,
-    ghostTime: 180,
+    minTime: 520,
+    ghostTime: 120,
     trickleMax: 94,
     autoStart: true
   }, global.$docsifyScorpiusLoader || {});
@@ -37,39 +37,34 @@
     '  user-select: none;',
     '  z-index: 99999999999999;',
     '  position: fixed;',
-    '  margin: auto;',
     '  top: 0;',
     '  left: 0;',
     '  right: 0;',
-    '  bottom: 0;',
-    '  width: 400px;',
+    '  width: 100vw;',
     '  border: 0;',
-    '  height: 1px;',
+    '  height: 3px;',
     '  overflow: hidden;',
-    '  background: rgba(212, 184, 120, 0.16);',
+    '  background: rgba(198, 169, 107, 0.16);',
     '  -webkit-transition: opacity 0.28s ease;',
     '  -o-transition: opacity 0.28s ease;',
     '  transition: opacity 0.28s ease;',
     '}',
     '.pace .pace-progress {',
-    '  -webkit-transform: translate3d(0, 0, 0);',
-    '  transform: translate3d(0, 0, 0);',
-    '  max-width: 300px;',
     '  z-index: 99999999999999;',
     '  display: block;',
     '  position: absolute;',
     '  top: 0;',
-    '  right: 100%;',
+    '  left: 0;',
     '  height: 100%;',
-    '  width: 100%;',
+    '  width: 0%;',
     '  background: #c6a96b;',
+    '  box-shadow: 0 0 12px rgba(198, 169, 107, 0.35);',
+    '  -webkit-transition: width 0.12s linear;',
+    '  -o-transition: width 0.12s linear;',
+    '  transition: width 0.12s linear;',
     '}',
     '.pace.pace-inactive {',
-    '  width: 100vw;',
     '  opacity: 0;',
-    '}',
-    '.pace.pace-inactive .pace-progress {',
-    '  max-width: 100vw;',
     '}',
     '#preloader {',
     '  width: 100%;',
@@ -134,7 +129,7 @@
     '  transition-delay: 0s;',
     '}',
     '@media (max-width: 480px) {',
-    '  .pace { width: calc(100vw - 48px); }',
+    '  .pace { height: 2px; }',
     '}'
   ].join('\n');
 
@@ -176,11 +171,7 @@
   function renderProgress(value) {
     state.progress = Math.max(0, Math.min(100, value));
     if (!state.paceProgress) return;
-
-    var transform = 'translate3d(' + state.progress + '%, 0, 0)';
-    state.paceProgress.style.webkitTransform = transform;
-    state.paceProgress.style.msTransform = transform;
-    state.paceProgress.style.transform = transform;
+    state.paceProgress.style.width = state.progress + '%';
     state.paceProgress.setAttribute('data-progress-text', (state.progress | 0) + '%');
 
     var display = state.progress >= 100 ? '99' : (state.progress < 10 ? '0' : '') + (state.progress | 0);

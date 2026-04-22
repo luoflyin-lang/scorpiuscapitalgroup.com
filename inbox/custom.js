@@ -3,6 +3,31 @@
 
   var docsify = window.$docsify = window.$docsify || {};
   var existingPlugins = docsify.plugins || [];
+  var styleInjected = false;
+
+  function injectCustomStyle() {
+    if (styleInjected || !document.head) return;
+    styleInjected = true;
+
+    var style = document.createElement('style');
+    style.id = 'scg-custom-layout-style';
+    style.textContent = [
+      '.content { min-height: 100vh; }',
+      '.markdown-section {',
+      '  min-height: calc(100vh - 120px);',
+      '  display: flex;',
+      '  flex-direction: column;',
+      '}',
+      '.markdown-section > footer {',
+      '  margin-top: auto;',
+      '  padding-top: 28px;',
+      '}',
+      '@media screen and (max-width: 768px) {',
+      '  .markdown-section { min-height: calc(100vh - 72px); }',
+      '}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
 
   function buildFooterHtml(isEnglish) {
     if (isEnglish) {
@@ -17,6 +42,10 @@
   }
 
   function customPlugin(hook) {
+    hook.mounted(function () {
+      injectCustomStyle();
+    });
+
     hook.afterEach(function (html, next) {
       next(html + buildFooterHtml(isEnglishRoute()));
     });
