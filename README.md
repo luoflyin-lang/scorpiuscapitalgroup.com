@@ -1,7 +1,6 @@
 # 心宿资本（美国）集团有限公司
 
-> 自有资金投资主体  
-> 地址：1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM 87110, United States
+> 自有资金投资主体
 
 以长期资本视角管理自有资金，只做自己理解且愿意长期持有的资产。
 
@@ -59,6 +58,6 @@ Founder 为公司唯一股东与最终决策人，负责：
 - [财务报表](/documents/financial-statements/)
 - [持仓披露](/documents/portfolio/)
 - [年度预测](/documents/forecasts/)
-- [隐私政策](/#/privacy)
-- [服务条款](/#/terms)
-- [English](/#/en/)
+- [隐私政策](/privacy.md)
+- [服务条款](/terms.md)
+- [English](/en/)

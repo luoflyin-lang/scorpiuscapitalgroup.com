@@ -1,7 +1,6 @@
 # Scorpius Capital Group LLC
 
-> Proprietary capital investment company  
-> Address: 1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM 87110, United States
+> Proprietary capital investment company
 
 Managing proprietary capital with a long-term mindset and owning only what we understand well enough to hold through time.
 
