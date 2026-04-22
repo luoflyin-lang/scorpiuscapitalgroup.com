@@ -50,3 +50,8 @@ This website serves as a public company profile and archive for:
 - [Annual Forecasts](/en/documents/forecasts/)
 - [Privacy Policy](/en/privacy.md)
 - [Terms of Use](/en/terms.md)
+
+<hr />
+<footer>
+  Copyright &copy; 2026 Scorpius Capital Group LLC. All rights reserved. | <a href="#/en/privacy">Privacy Policy</a> | <a href="#/en/terms">Terms of Use</a> | <a href="mailto:support@scorpiuscapitalgroup.com">support@scorpiuscapitalgroup.com</a> | 1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM 87110, United States
+</footer>
