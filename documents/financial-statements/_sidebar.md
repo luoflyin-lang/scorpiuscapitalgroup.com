@@ -1,0 +1,3 @@
+- [财务报表](/documents/financial-statements/)
+  - [2026 年度公开说明](/documents/financial-statements/FS2026.md)
+  - [2025 年度公开说明](/documents/financial-statements/FS2025.md)
