@@ -12,3 +12,5 @@
 - [Media Kit](/en/media.md)
 - [Privacy Policy](/en/privacy.md)
 - [Terms of Use](/en/terms.md)
+- [简体中文](/#/)
+- [Email](mailto:support@scorpiuscapitalgroup.com)

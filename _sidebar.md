@@ -11,3 +11,7 @@
  - [常见问题](/faq.md)
  - [更新记录](/changelog.md)
  - [媒体资料](/media.md)
+ - [隐私政策](/privacy.md)
+ - [服务条款](/terms.md)
+ - [English](/#/en/)
+ - [联系邮箱](mailto:support@scorpiuscapitalgroup.com)
