@@ -7,5 +7,5 @@
 
 <hr />
 <footer>
-  © 2026 Scorpius Capital Group LLC. All rights reserved.  <a href="/privacy">Privacy Policy</a>  |  <a href="/terms">Terms of Use</a>  |  <a href="support@scorpiuscapitalgroup.com">Contact</a>
+  © 2026 Scorpius Capital Group LLC. All rights reserved.  <a href="#/privacy">Privacy Policy</a>  |  <a href="#/terms">Terms of Use</a>  |  <a href="mailto:support@scorpiuscapitalgroup.com">Contact</a>
 </footer>
