@@ -4,14 +4,15 @@
   var global = window;
   var docsify = global.$docsify = global.$docsify || {};
   var options = Object.assign({
-    minTime: 250,
-    ghostTime: 100,
+    minTime: 120,
+    ghostTime: 60,
     trickleMax: 92,
     autoStart: true
   }, global.$docsifyScorpiusLoader || {});
 
   var state = {
     bootstrapped: false,
+    initialDone: false,
     status: 'idle',
     progress: 0,
     startTime: 0,
@@ -42,10 +43,10 @@
     '  border: 0;',
     '  height: 1px;',
     '  overflow: hidden;',
-    '  background: rgba(212, 184, 120, 0.16)',
-    '  -webkit-transition: all 1s;',
-    '  -o-transition: all 1s;',
-    '  transition: all 1s;',
+    '  background: rgba(212, 184, 120, 0.16);',
+    '  -webkit-transition: opacity 0.3s ease;',
+    '  -o-transition: opacity 0.3s ease;',
+    '  transition: opacity 0.3s ease;',
     '}',
     '.pace .pace-progress {',
     '  -webkit-transform: translate3d(0, 0, 0);',
@@ -91,19 +92,19 @@
     '#preloader:after { bottom: 0; }',
     '#preloader.isdone {',
     '  visibility: hidden;',
-    '  -webkit-transition-delay: 1.5s;',
-    '  -o-transition-delay: 1.5s;',
-    '  transition-delay: 1.5s;',
+    '  -webkit-transition-delay: 0s;',
+    '  -o-transition-delay: 0s;',
+    '  transition-delay: 0s;',
     '}',
     '#preloader.isdone:after,',
     '#preloader.isdone:before {',
     '  height: 0;',
-    '  -webkit-transition: all 0.7s cubic-bezier(1, 0, 0.55, 1);',
-    '  -o-transition: all 0.7s cubic-bezier(1, 0, 0.55, 1);',
-    '  transition: all 0.7s cubic-bezier(1, 0, 0.55, 1);',
-    '  -webkit-transition-delay: 1s;',
-    '  -o-transition-delay: 1s;',
-    '  transition-delay: 1s;',
+    '  -webkit-transition: all 0.35s cubic-bezier(1, 0, 0.55, 1);',
+    '  -o-transition: all 0.35s cubic-bezier(1, 0, 0.55, 1);',
+    '  transition: all 0.35s cubic-bezier(1, 0, 0.55, 1);',
+    '  -webkit-transition-delay: 0s;',
+    '  -o-transition-delay: 0s;',
+    '  transition-delay: 0s;',
     '}',
     '.loading-text {',
     '  font-size: 40px;',
@@ -122,12 +123,12 @@
     '.loading-text.isdone {',
     '  top: 50%;',
     '  opacity: 0;',
-    '  -webkit-transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);',
-    '  -o-transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);',
-    '  transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);',
-    '  -webkit-transition-delay: .5s;',
-    '  -o-transition-delay: .5s;',
-    '  transition-delay: .5s;',
+    '  -webkit-transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);',
+    '  -o-transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);',
+    '  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);',
+    '  -webkit-transition-delay: 0s;',
+    '  -o-transition-delay: 0s;',
+    '  transition-delay: 0s;',
     '}',
     '@media (max-width: 480px) {',
     '  .pace { width: calc(100vw - 48px); }',
@@ -212,6 +213,8 @@
   }
 
   function start() {
+    if (state.initialDone || state.status === 'running') return;
+
     injectStyle();
     ensureDom();
     if (!state.preloader || !state.pace || !state.paceProgress) return;
@@ -246,6 +249,7 @@
       state.pace.classList.add('pace-inactive');
       setBodyRunning(false);
       state.status = 'idle';
+      state.initialDone = true;
     }, finishDelay);
   }
 
@@ -254,6 +258,7 @@
     state.bootstrapped = true;
     injectStyle();
     ensureDom();
+
     if (options.autoStart) start();
   }
 
@@ -268,13 +273,10 @@
       bootstrap();
     });
 
-    hook.beforeEach(function (content) {
-      start();
-      return content;
-    });
-
     hook.doneEach(function () {
-      finish();
+      if (!state.initialDone) {
+        finish();
+      }
     });
   }
 
