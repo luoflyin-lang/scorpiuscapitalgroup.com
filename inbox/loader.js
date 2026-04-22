@@ -7,8 +7,8 @@
     // 只影响“动画观感”，不会影响真实资源下载速度
     // 想更有“加载感”就把 minTime 再加一点，比如 600~700
     // 想更利落就降到 350~450
-    minTime: 520,
-    ghostTime: 140,
+    minTime: 650,
+    ghostTime: 180,
     trickleMax: 94,
     autoStart: true
   }, global.$docsifyScorpiusLoader || {});
