@@ -1,0 +1,3 @@
+- [Financial Statements](/en/documents/financial-statements/)
+  - [2026 Public Note](/en/documents/financial-statements/FS2026.md)
+  - [2025 Public Note](/en/documents/financial-statements/FS2025.md)

@@ -4,6 +4,8 @@
 > 电子邮箱：support@scorpiuscapitalgroup.com  
 > 地址：1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM 87110, United States
 
+以长期资本视角管理自有资金，只做自己理解且愿意长期持有的资产。
+
 ## 公司说明
 
 Scorpius Capital Group LLC 是一家仅使用自有资金开展证券投资与资产配置的美国公司。
@@ -28,11 +30,20 @@ Scorpius Capital Group LLC 是一家仅使用自有资金开展证券投资与�
 
 ## 文档入口
 
+- [关于公司](/about.md)
+- [投资方法](/philosophy.md)
+- [披露更新说明](/disclosures.md)
+- [归档总目录](/archive.md)
 - [财务报表](/documents/financial-statements/)
 - [持仓披露](/documents/portfolio/)
 - [年度预测](/documents/forecasts/)
+- [联系](/contact.md)
+- [常见问题](/faq.md)
+- [更新记录](/changelog.md)
+- [媒体资料](/media.md)
 - [隐私政策](/#/privacy)
 - [服务条款](/#/terms)
+- [English](/#/en/)
 
 <hr />
 <footer>
