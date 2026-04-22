@@ -14,40 +14,12 @@
       top: 16px;
       right: 18px;
       z-index: 10001;
-      display: flex;
-      gap: 8px;
-      padding: 8px;
-      border-radius: 999px;
-      background: rgba(17, 17, 17, 0.82);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .scg-lang-switch__link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 72px;
-      height: 36px;
-      padding: 0 14px;
-      border-radius: 999px;
-      text-decoration: none;
       font-size: 14px;
-      font-weight: 600;
-      color: #4f4f4f;
-      background: rgba(255, 255, 255, 0.9);
-      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      line-height: 1.4;
     }
 
-    .scg-lang-switch__link:hover {
-      transform: translateY(-1px);
-      background: #ffffff;
-    }
-
-    .scg-lang-switch__link.is-active {
-      color: #111111;
-      background: #c6a96b;
+    .scg-lang-switch a {
+      text-decoration: none;
     }
 
     .scg-site-footer {
@@ -59,38 +31,10 @@
       line-height: 1.8;
     }
 
-    .scg-site-footer__brand {
-      font-weight: 600;
-      color: #333333;
-    }
-
-    .scg-site-footer__links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 14px;
-      margin-top: 6px;
-    }
-
-    .scg-site-footer__links a {
-      text-decoration: none;
-    }
-
-    .scg-site-footer__contact,
-    .scg-site-footer__address {
-      margin-top: 4px;
-    }
-
     @media (max-width: 640px) {
       .scg-lang-switch {
         top: 12px;
         right: 12px;
-        padding: 6px;
-      }
-
-      .scg-lang-switch__link {
-        min-width: 66px;
-        height: 34px;
-        padding: 0 12px;
         font-size: 13px;
       }
     }
@@ -140,7 +84,7 @@
         root = document.createElement('div');
         root.id = 'scg-lang-switch';
         root.className = 'scg-lang-switch';
-        root.innerHTML = '<a class="scg-lang-switch__link" data-lang="zh" href="#/">中文</a><a class="scg-lang-switch__link" data-lang="en" href="#/en/">English</a>';
+        root.innerHTML = '<a data-lang="zh" href="#/">简体中文</a> | <a data-lang="en" href="#/en/">English</a>';
         document.body.appendChild(root);
       }
 
@@ -150,8 +94,6 @@
 
       zhLink.setAttribute('href', scgToHashHref(paths.zhPath));
       enLink.setAttribute('href', scgToHashHref(paths.enPath));
-      zhLink.classList.toggle('is-active', !paths.isEnglish);
-      enLink.classList.toggle('is-active', paths.isEnglish);
     }
 
     window.$docsify = {
@@ -161,7 +103,9 @@
       routerMode: 'hash',
       notFoundPage: './_404.md',
       alias: {
+        '/en/_sidebar.md': '/en/_sidebar.md',
         '/en/.*/_sidebar.md': '/en/_sidebar.md',
+        '/_sidebar.md': '/_sidebar.md',
         '/.*/_sidebar.md': '/_sidebar.md',
       },
       plugins: [
@@ -173,8 +117,8 @@
           hook.afterEach(function (html, next) {
             var isEnglish = location.hash.indexOf('#/en/') === 0 || location.hash === '#/en';
             var footer = isEnglish
-              ? '\n\n<footer class="scg-site-footer"><div class="scg-site-footer__brand">Scorpius Capital Group LLC</div><div class="scg-site-footer__links"><a href="#/en/privacy">Privacy Policy</a><a href="#/en/terms">Terms of Use</a></div><div class="scg-site-footer__contact"><a href="mailto:support@scorpiuscapitalgroup.com">support@scorpiuscapitalgroup.com</a></div><div class="scg-site-footer__address">1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM 87110, United States</div></footer>'
-              : '\n\n<footer class="scg-site-footer"><div class="scg-site-footer__brand">Scorpius Capital Group LLC</div><div class="scg-site-footer__links"><a href="#/privacy">隐私政策</a><a href="#/terms">服务条款</a></div><div class="scg-site-footer__contact"><a href="mailto:support@scorpiuscapitalgroup.com">support@scorpiuscapitalgroup.com</a></div><div class="scg-site-footer__address">1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM 87110, United States</div></footer>';
+              ? '\n\n<footer class="scg-site-footer">Copyright © 2026 Scorpius Capital Group LLC. All rights reserved. | <a href="#/en/privacy">Privacy Policy</a> | <a href="#/en/terms">Terms of Use</a> | <a href="mailto:support@scorpiuscapitalgroup.com">support@scorpiuscapitalgroup.com</a> | 1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM 87110, United States</footer>'
+              : '\n\n<footer class="scg-site-footer">版权所有 © 2026 Scorpius Capital Group LLC | <a href="#/privacy">隐私政策</a> | <a href="#/terms">服务条款</a> | <a href="mailto:support@scorpiuscapitalgroup.com">support@scorpiuscapitalgroup.com</a> | 1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM 87110, United States</footer>';
             next(html + footer);
           });
 
