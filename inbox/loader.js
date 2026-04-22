@@ -4,9 +4,12 @@
   var global = window;
   var docsify = global.$docsify = global.$docsify || {};
   var options = Object.assign({
-    minTime: 120,
-    ghostTime: 60,
-    trickleMax: 92,
+    // 只影响“动画观感”，不会影响真实资源下载速度
+    // 想更有“加载感”就把 minTime 再加一点，比如 600~700
+    // 想更利落就降到 350~450
+    minTime: 520,
+    ghostTime: 140,
+    trickleMax: 94,
     autoStart: true
   }, global.$docsifyScorpiusLoader || {});
 
@@ -44,9 +47,9 @@
     '  height: 1px;',
     '  overflow: hidden;',
     '  background: rgba(212, 184, 120, 0.16);',
-    '  -webkit-transition: opacity 0.3s ease;',
-    '  -o-transition: opacity 0.3s ease;',
-    '  transition: opacity 0.3s ease;',
+    '  -webkit-transition: opacity 0.28s ease;',
+    '  -o-transition: opacity 0.28s ease;',
+    '  transition: opacity 0.28s ease;',
     '}',
     '.pace .pace-progress {',
     '  -webkit-transform: translate3d(0, 0, 0);',
@@ -99,9 +102,9 @@
     '#preloader.isdone:after,',
     '#preloader.isdone:before {',
     '  height: 0;',
-    '  -webkit-transition: all 0.35s cubic-bezier(1, 0, 0.55, 1);',
-    '  -o-transition: all 0.35s cubic-bezier(1, 0, 0.55, 1);',
-    '  transition: all 0.35s cubic-bezier(1, 0, 0.55, 1);',
+    '  -webkit-transition: all 0.42s cubic-bezier(1, 0, 0.55, 1);',
+    '  -o-transition: all 0.42s cubic-bezier(1, 0, 0.55, 1);',
+    '  transition: all 0.42s cubic-bezier(1, 0, 0.55, 1);',
     '  -webkit-transition-delay: 0s;',
     '  -o-transition-delay: 0s;',
     '  transition-delay: 0s;',
@@ -123,9 +126,9 @@
     '.loading-text.isdone {',
     '  top: 50%;',
     '  opacity: 0;',
-    '  -webkit-transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);',
-    '  -o-transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);',
-    '  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);',
+    '  -webkit-transition: all 0.32s cubic-bezier(0.19, 1, 0.22, 1);',
+    '  -o-transition: all 0.32s cubic-bezier(0.19, 1, 0.22, 1);',
+    '  transition: all 0.32s cubic-bezier(0.19, 1, 0.22, 1);',
     '  -webkit-transition-delay: 0s;',
     '  -o-transition-delay: 0s;',
     '  transition-delay: 0s;',
@@ -173,11 +176,13 @@
   function renderProgress(value) {
     state.progress = Math.max(0, Math.min(100, value));
     if (!state.paceProgress) return;
+
     var transform = 'translate3d(' + state.progress + '%, 0, 0)';
     state.paceProgress.style.webkitTransform = transform;
     state.paceProgress.style.msTransform = transform;
     state.paceProgress.style.transform = transform;
     state.paceProgress.setAttribute('data-progress-text', (state.progress | 0) + '%');
+
     var display = state.progress >= 100 ? '99' : (state.progress < 10 ? '0' : '') + (state.progress | 0);
     state.paceProgress.setAttribute('data-progress', display);
   }
@@ -202,10 +207,12 @@
 
     var p = state.progress;
     var inc;
-    if (p < 12) inc = dt * 0.18;
-    else if (p < 35) inc = dt * 0.09;
-    else if (p < 60) inc = dt * 0.04;
-    else if (p < 80) inc = dt * 0.018;
+
+    // 视觉上慢一点，但不阻塞真实加载
+    if (p < 10) inc = dt * 0.12;
+    else if (p < 28) inc = dt * 0.075;
+    else if (p < 55) inc = dt * 0.038;
+    else if (p < 78) inc = dt * 0.017;
     else inc = dt * 0.006;
 
     renderProgress(Math.min(options.trickleMax, p + inc));
@@ -213,7 +220,8 @@
   }
 
   function start() {
-    if (state.initialDone || state.status === 'running') return;
+    // 只允许首次进入站点时跑一次
+    if (state.initialDone || state.status === 'running' || state.status === 'finishing') return;
 
     injectStyle();
     ensureDom();
@@ -227,8 +235,10 @@
     state.preloader.classList.remove('isdone');
     state.pace.classList.remove('pace-inactive');
     state.pace.classList.add('pace-active');
+
     setBodyRunning(true);
     renderProgress(0);
+
     state.rafId = requestAnimationFrame(tick);
   }
 
@@ -256,6 +266,7 @@
   function bootstrap() {
     if (state.bootstrapped) return;
     state.bootstrapped = true;
+
     injectStyle();
     ensureDom();
 
@@ -273,6 +284,8 @@
       bootstrap();
     });
 
+    // 这里只在首次加载完成时结束一次
+    // 不再在站内切换页面时重新 start()
     hook.doneEach(function () {
       if (!state.initialDone) {
         finish();
