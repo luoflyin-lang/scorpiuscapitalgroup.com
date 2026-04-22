@@ -4,12 +4,8 @@ This page provides a consolidated index of the main public records on the site.
 
 ## Company Pages
 
-- [About](/en/about.md)
 - [Investment Philosophy](/en/philosophy.md)
 - [Disclosure Updates](/en/disclosures.md)
-- [Contact](/en/contact.md)
-- [FAQ](/en/faq.md)
-- [Media Kit](/en/media.md)
 
 ## Financial Statements
 
@@ -28,6 +24,5 @@ This page provides a consolidated index of the main public records on the site.
 
 ## Site Records
 
-- [Changelog](/en/changelog.md)
 - [Privacy Policy](/en/privacy.md)
 - [Terms of Use](/en/terms.md)

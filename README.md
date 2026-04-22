@@ -1,7 +1,6 @@
 # 心宿资本（美国）集团有限公司
 
 > 自有资金投资主体  
-> 电子邮箱：support@scorpiuscapitalgroup.com  
 > 地址：1209 MOUNTAIN ROAD PL NE, STE N, ALBUQUERQUE, NM 87110, United States
 
 以长期资本视角管理自有资金，只做自己理解且愿意长期持有的资产。
@@ -11,6 +10,30 @@
 Scorpius Capital Group LLC 是一家仅使用自有资金开展证券投资与资产配置的美国公司。
 
 本公司不向公众募集资金，不接受客户委托，不提供投资顾问、经纪、托管或基金管理服务。公司股权为单一股东结构，投资决策、风险承担与资本安排均由公司内部完成。
+
+## 股权与治理
+
+1. 公司为单一股东结构。
+2. 股东、管理与投资判断保持统一，不存在外部 LP、客户账户或合伙人资本约束。
+3. 所有资本决策均围绕长期存续、审慎配置和风险承受能力展开。
+
+## 设立目的
+
+公司设立的核心目的，不是扩大规模或追求外部资金，而是为长期资本配置建立一个清晰、可归档、可独立运作的实体。
+
+这一结构带来的好处是：
+
+1. 可以只对自有资本负责。
+2. 可以使用更长周期评估企业与市场。
+3. 可以避免短期申购赎回、销售压力或客户预期对决策的干扰。
+
+## Founder
+
+Founder 为公司唯一股东与最终决策人，负责：
+
+1. 公司资本安排与风险边界设定。
+2. 长期持仓研究与组合构建。
+3. 年度预测、披露归档与网站内容更新。
 
 ## 网站用途
 
@@ -30,22 +53,12 @@ Scorpius Capital Group LLC 是一家仅使用自有资金开展证券投资与�
 
 ## 文档入口
 
-- [关于公司](/about.md)
 - [投资方法](/philosophy.md)
 - [披露更新说明](/disclosures.md)
 - [归档总目录](/archive.md)
 - [财务报表](/documents/financial-statements/)
 - [持仓披露](/documents/portfolio/)
 - [年度预测](/documents/forecasts/)
-- [联系](/contact.md)
-- [常见问题](/faq.md)
-- [更新记录](/changelog.md)
-- [媒体资料](/media.md)
 - [隐私政策](/#/privacy)
 - [服务条款](/#/terms)
 - [English](/#/en/)
-
-<hr />
-<footer>
-  © 2026 Scorpius Capital Group LLC. All rights reserved. <a href="#/privacy">Privacy Policy</a> | <a href="#/terms">Terms of Use</a> | <a href="mailto:support@scorpiuscapitalgroup.com">Contact</a>
-</footer>

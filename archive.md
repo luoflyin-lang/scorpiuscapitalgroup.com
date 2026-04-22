@@ -4,12 +4,8 @@
 
 ## 公司页
 
-- [关于公司](/about.md)
 - [投资方法](/philosophy.md)
 - [披露更新说明](/disclosures.md)
-- [联系](/contact.md)
-- [常见问题](/faq.md)
-- [媒体资料](/media.md)
 
 ## 财务报表归档
 
@@ -28,6 +24,5 @@
 
 ## 站点记录
 
-- [更新记录](/changelog.md)
 - [隐私政策](/privacy.md)
 - [服务条款](/terms.md)

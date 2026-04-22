@@ -16,11 +16,25 @@
     window.$docsify = {
       name: 'Scorpius Capital Group',
       loadSidebar: true,
-      loadNavbar: false,
+      loadNavbar: true,
       routerMode: 'hash',
       notFoundPage: './_404.md',
+      alias: {
+        '/en/.*/_sidebar.md': '/en/_sidebar.md',
+        '/en/.*/_navbar.md': '/en/_navbar.md',
+        '/.*/_sidebar.md': '/_sidebar.md',
+        '/.*/_navbar.md': '/_navbar.md'
+      },
       plugins: [
         function (hook) {
+          hook.afterEach(function (html, next) {
+            var isEnglish = location.hash.indexOf('#/en/') === 0 || location.hash === '#/en';
+            var footer = isEnglish
+              ? '\n\n<hr />\n<footer>© 2026 Scorpius Capital Group LLC. All rights reserved. <a href="#/en/privacy">Privacy Policy</a> | <a href="#/en/terms">Terms of Use</a> | <a href="mailto:support@scorpiuscapitalgroup.com">support@scorpiuscapitalgroup.com</a></footer>'
+              : '\n\n<hr />\n<footer>© 2026 Scorpius Capital Group LLC. All rights reserved. <a href="#/privacy">隐私政策</a> | <a href="#/terms">服务条款</a> | <a href="mailto:support@scorpiuscapitalgroup.com">support@scorpiuscapitalgroup.com</a></footer>';
+            next(html + footer);
+          });
+
           hook.doneEach(function () {
             const marker = document.getElementById('docsify-404-redirect');
             if (!marker) return;
