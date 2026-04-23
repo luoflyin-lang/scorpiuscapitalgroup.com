@@ -1,4 +1,0 @@
-- [Home](/en/)
-- [Financial Statements](/en/documents/financial-statements/)
-- [Portfolio Disclosure](/en/documents/portfolio/)
-- [Annual Forecasts](/en/documents/forecasts/)

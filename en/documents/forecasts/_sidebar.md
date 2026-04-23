@@ -1,2 +1,0 @@
-- [Annual Forecasts](/en/documents/forecasts/)
-  - [2026 Annual Forecast](/en/documents/forecasts/FC2026.md)
