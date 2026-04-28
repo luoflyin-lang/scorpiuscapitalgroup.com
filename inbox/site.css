@@ -1,0 +1,33 @@
+section.cover {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.78)),
+    url('./cover.jpeg') center/cover no-repeat !important;
+}
+
+section.cover .cover-main > p:last-child {
+  display: none;
+}
+
+section.cover .cover-main > img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+}
+
+section.cover h1 {
+  color: #0f172a;
+}
+
+section.cover blockquote {
+  color: #334155;
+}
+
+section.cover .anchor span {
+  color: #0f172a;
+}
+
+section.cover .cover-main > p:last-of-type a {
+  border-radius: 6px;
+}
