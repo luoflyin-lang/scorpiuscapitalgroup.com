@@ -1,4 +1,4 @@
-![logo](./inbox/logo.jpg)
+![logo](./inbox/cover.jpeg)
 
 # Scorpius Capital Group
 
