@@ -1,7 +1,38 @@
 section.cover {
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.78)),
-    url('./cover.jpeg') center/cover no-repeat !important;
+  --cover-image: url('./cover.jpeg');
+  isolation: isolate;
+  overflow: hidden;
+  background: #0b1018 !important;
+}
+
+section.cover::before,
+section.cover::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+section.cover::before {
+  inset: -36px;
+  z-index: 0;
+  background: var(--cover-image) center/cover no-repeat;
+  filter: blur(28px);
+  opacity: 0.32;
+  transform: scale(1.04);
+}
+
+section.cover::after {
+  inset: 0;
+  z-index: 1;
+  background: var(--cover-image) center/contain no-repeat;
+}
+
+section.cover.has-mask .mask {
+  display: none !important;
+}
+
+section.cover .cover-main {
+  z-index: 2;
 }
 
 section.cover .cover-main > p:last-child {
