@@ -1,1 +1,1 @@
-![cover](./inbox/cover.jpeg)
+![cover](./inbox/cover.svg)
