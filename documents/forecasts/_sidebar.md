@@ -1,2 +1,2 @@
 - [年度预测报告](/documents/forecasts/)
-  - [2026](/documents/forecasts/FC2026.md)
+  - [2026 年度预测报告](/documents/forecasts/FC2026.md)
