@@ -1,1 +1,716 @@
 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>心宿资本（美国）集团有限公司 · SCORPIUS CAPITAL GROUP</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper:      #F7F5F0;
+  --paper-warm: #EDE8DD;
+
+  --ink:   #14201C;
+  --ink-2: #2F3A36;
+  --ink-3: #6B736E;
+  --ink-4: #9A9F99;
+  --ink-5: #C9CAC3;
+  --ink-6: #DDDBD2;
+
+  --grid-line:        rgba(20, 32, 28, 0.08);
+  --grid-line-strong: rgba(20, 32, 28, 0.15);
+
+  --tv-green: #3E6B4F;
+  --tv-red:   #9C4332;
+
+  --ma6:  #4A5D6E;
+  --ma12: #B59049;
+  --gold-soft: #C9A35E;
+
+  --t-xs: 11px;
+  --t-sm: 13px;
+  --t-base: 15px;
+  --t-md: 17px;
+  --t-lg: 22px;
+  --t-xl: 32px;
+  --t-2xl: 44px;
+  --t-3xl: 64px;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+  --s-9: 80px; --s-10: 96px;
+
+  --nav-h: 72px;
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto,
+    "PingFang SC", "Microsoft YaHei", "Microsoft YaHei UI",
+    "HarmonyOS Sans SC", "Source Han Sans SC", "Noto Sans SC",
+    "Helvetica Neue", Arial, sans-serif;
+
+  --font-mono:
+    ui-monospace, "SF Mono", "Cascadia Code",
+    Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+html { font-size: 16px; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  line-height: 1.6;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; background: none; border: none; color: inherit; }
+.font-mono { font-family: var(--font-mono); font-feature-settings: "tnum" 1; }
+.section-num { font-family: var(--font-mono); font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.3em; color: var(--ink-4); }
+.scroll-progress { position: fixed; top: 0; left: 0; height: 2px; background: var(--ma12); z-index: 100; transition: width 0.1s; width: 0%; }
+
+/* === NAV === */
+.nav { display: flex; height: var(--nav-h); border-bottom: 1px solid var(--grid-line); position: sticky; top: 0; background: var(--paper); z-index: 40; }
+.nav-left { width: 41.666%; border-right: 1px solid var(--grid-line); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--s-7); gap: var(--s-4); }
+.logo-block { display: flex; align-items: center; gap: var(--s-3); min-width: 0; }
+.logo-img { width: 40px; height: 40px; object-fit: cover; flex-shrink: 0; display: block; border-radius: 2px; }
+.logo-text { font-weight: 700; font-size: 18px; letter-spacing: -0.015em; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lang-btn { display: flex; align-items: center; gap: var(--s-2); font-size: var(--t-xs); font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid var(--grid-line-strong); padding: 7px 12px; transition: all 0.3s; flex-shrink: 0; }
+.lang-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.nav-right { width: 58.333%; display: flex; }
+.nav-links { flex: 1; display: flex; }
+.nav-link { flex: 1; display: flex; align-items: center; justify-content: center; font-size: var(--t-sm); font-weight: 500; letter-spacing: 0.05em; transition: all 0.3s; }
+.nav-link + .nav-link { border-left: 1px solid var(--grid-line); }
+.nav-link:hover { background: var(--ink); color: var(--paper); }
+.nav-cta { width: 28%; border-left: 1px solid var(--grid-line); display: flex; align-items: center; justify-content: center; gap: var(--s-2); font-size: var(--t-sm); font-weight: 500; letter-spacing: 0.05em; transition: all 0.3s; }
+.nav-cta:hover { background: var(--ink); color: var(--paper); }
+
+/* === FIRST SCREEN === */
+.first-screen { display: flex; flex-direction: column; height: calc(100vh - var(--nav-h)); min-height: 720px; }
+.hero { flex: 1 1 auto; display: flex; border-bottom: 1px solid var(--grid-line); min-height: 0; }
+.hero-left { width: 41.666%; border-right: 1px solid var(--grid-line); display: flex; flex-direction: column; justify-content: center; padding: var(--s-7) var(--s-8); background: var(--paper); overflow: hidden; }
+.hero-title { font-size: clamp(36px, 4.5vw, 56px); font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; margin-bottom: var(--s-6); }
+.hero-title .accent { color: var(--ma12); font-weight: 700; }
+.hero-title.en { text-transform: uppercase; letter-spacing: -0.045em; }
+.hero-desc { font-size: var(--t-base); font-weight: 400; color: var(--ink-2); line-height: 1.85; max-width: 460px; margin-bottom: var(--s-7); letter-spacing: 0.005em; }
+.hero-cta { display: inline-flex; align-items: center; gap: var(--s-3); font-size: var(--t-sm); font-weight: 500; letter-spacing: 0.08em; border: 1px solid var(--ink); padding: 14px 24px; transition: all 0.3s; white-space: nowrap; align-self: flex-start; }
+.hero-cta:hover { background: var(--ink); color: var(--paper); }
+
+/* === CHART === */
+.hero-right { width: 58.333%; background: var(--paper-warm); padding: var(--s-6); display: flex; flex-direction: column; min-height: 0; }
+.chart-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--s-3); flex-shrink: 0; }
+.chart-symbol { font-family: var(--font-mono); font-size: var(--t-sm); font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; display: flex; align-items: center; gap: var(--s-2); }
+.chart-tag { font-family: var(--font-mono); font-size: 10px; color: var(--ink-2); background: var(--paper); border: 1px solid var(--grid-line-strong); padding: 3px 8px; margin-left: var(--s-3); }
+.chart-live { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; color: var(--ink-3); display: flex; align-items: center; gap: 6px; }
+.live-dot { width: 6px; height: 6px; background: var(--ma12); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+.chart-wrap { flex: 1 1 auto; min-height: 280px; position: relative; border: 1px solid var(--grid-line-strong); background: var(--paper); overflow: hidden; cursor: crosshair; }
+.chart-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-18deg); font-family: var(--font-mono); font-size: 56px; font-weight: 700; color: rgba(20, 32, 28, 0.04); letter-spacing: 0.15em; pointer-events: none; z-index: 5; white-space: nowrap; }
+.ohlc-bar { position: absolute; top: 8px; left: 12px; right: 12px; font-family: var(--font-mono); font-size: 10px; display: flex; flex-wrap: wrap; gap: 10px; row-gap: 4px; z-index: 10; padding: 6px 10px; background: rgba(247,245,240,0.95); border: 1px solid var(--grid-line); }
+.ohlc-bar .label { color: var(--ink-4); }
+.ohlc-bar .ma-legend { display: flex; gap: 10px; margin-left: auto; }
+.ma-tag { display: flex; align-items: center; gap: 4px; }
+.ma-dot { width: 8px; height: 2px; }
+.y-axis { position: absolute; right: 0; top: 0; bottom: 24px; width: 56px; border-left: 1px solid var(--grid-line-strong); background: var(--paper); pointer-events: none; z-index: 10; }
+.y-tick { position: absolute; right: 8px; font-family: var(--font-mono); font-size: 9px; color: var(--ink-4); transform: translateY(-50%); }
+.y-cross-label { position: absolute; right: 0; width: 100%; text-align: center; font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--paper); background: var(--ink); padding: 2px 0; transform: translateY(-50%); display: none; }
+.x-axis { position: absolute; bottom: 0; left: 0; right: 56px; height: 24px; border-top: 1px solid var(--grid-line-strong); background: var(--paper); display: flex; justify-content: space-between; align-items: center; padding: 0 var(--s-4); font-family: var(--font-mono); font-size: 9px; color: var(--ink-3); }
+.x-cross-label { position: absolute; bottom: 0; height: 24px; align-items: center; justify-content: center; pointer-events: none; z-index: 20; display: none; }
+.x-cross-label > div { background: var(--ink); color: var(--paper); font-family: var(--font-mono); font-size: 10px; font-weight: 700; padding: 2px 8px; }
+.chart-stats { display: flex; justify-content: space-between; align-items: flex-end; margin-top: var(--s-4); padding-top: var(--s-4); border-top: 1px solid var(--grid-line); flex-shrink: 0; }
+.stat-label { font-size: var(--t-xs); font-weight: 500; letter-spacing: 0.08em; color: var(--ink-3); margin-bottom: var(--s-2); }
+.stat-value { font-family: var(--font-mono); font-size: 22px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+.stat-value.gold { color: var(--ma12); }
+.chart-error { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; padding: 20px; text-align: center; font-size: 13px; color: var(--ink-3); }
+.chart-error code { font-family: var(--font-mono); font-size: 11px; background: var(--paper-warm); padding: 2px 6px; }
+
+/* === STATS ROW === */
+.stats-row { flex: 0 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--paper); border-bottom: 1px solid var(--grid-line); }
+.stat-card { padding: var(--s-5) var(--s-6); border-right: 1px solid var(--grid-line); position: relative; transition: background 0.3s; min-height: 180px; display: flex; flex-direction: column; }
+.stat-card:last-child { border-right: none; }
+.stat-card:hover { background: var(--paper-warm); }
+.stat-card.dark { background: linear-gradient(180deg, #1A2722 0%, #14201C 100%); color: var(--paper); cursor: pointer; }
+.stat-card.dark:hover { background: linear-gradient(180deg, #20302A 0%, #182520 100%); }
+.stat-index { position: absolute; top: var(--s-4); left: var(--s-5); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: rgba(20,32,28,0.25); }
+.stat-card.dark .stat-index { color: rgba(247,245,240,0.25); }
+.stat-card-label { font-size: var(--t-xs); font-weight: 500; letter-spacing: 0.08em; color: var(--ink-4); padding-top: var(--s-5); }
+.stat-card-value { font-family: var(--font-sans); font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin: var(--s-4) 0 var(--s-3); }
+.stat-card-value.numeric { font-size: var(--t-2xl); letter-spacing: -0.03em; line-height: 1; }
+.stat-card-desc { font-size: var(--t-sm); font-weight: 500; color: var(--ink-2); line-height: 1.5; margin-top: auto; }
+.stat-card.dark .stat-card-label { color: var(--ink-5); }
+.stat-card.dark .stat-card-desc { color: var(--paper); font-size: var(--t-md); font-weight: 700; letter-spacing: 0; }
+.stat-card-cta-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+
+/* === PHILOSOPHY === */
+.philo { display: flex; border-bottom: 1px solid var(--grid-line); }
+.philo-left { width: 33.333%; padding: var(--s-9) var(--s-8); border-right: 1px solid var(--grid-line); background: var(--paper); display: flex; flex-direction: column; justify-content: center; }
+.philo-title { font-size: clamp(32px, 3.5vw, var(--t-2xl)); font-weight: 700; letter-spacing: -0.035em; line-height: 1.15; margin-bottom: var(--s-6); }
+.philo-title.en { text-transform: uppercase; }
+.philo-title .accent { color: var(--ma12); font-weight: 700; }
+.philo-desc { font-size: var(--t-base); color: var(--ink-2); line-height: 1.85; letter-spacing: 0.005em; }
+.philo-right { width: 66.666%; background: var(--paper-warm); display: flex; flex-direction: column; }
+.philo-card { flex: 1; padding: var(--s-7); border-bottom: 1px solid var(--grid-line); display: flex; gap: var(--s-7); align-items: flex-start; transition: background 0.3s; cursor: pointer; position: relative; }
+.philo-card:last-child { border-bottom: none; }
+.philo-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--ma12); transform: scaleY(0); transform-origin: top; transition: transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+.philo-card:hover { background: var(--paper); }
+.philo-card:hover::before { transform: scaleY(1); }
+.philo-num { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--ink-6); width: 48px; padding-top: 4px; transition: color 0.3s; flex-shrink: 0; }
+.philo-card:hover .philo-num { color: var(--ma12); }
+.philo-card-content { max-width: 620px; }
+.philo-card-title { font-size: var(--t-lg); font-weight: 700; letter-spacing: -0.01em; margin-bottom: 6px; line-height: 1.3; }
+.philo-card-en { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: var(--ink-3); text-transform: uppercase; margin-bottom: var(--s-4); }
+.philo-card-desc { font-size: var(--t-base); color: var(--ink-2); line-height: 1.85; letter-spacing: 0.005em; }
+
+/* === FOOTER === */
+.footer { padding: var(--s-7) var(--s-7) var(--s-5); background: var(--paper); }
+.footer-grid { display: grid; grid-template-columns: 1.5fr 0.9fr 0.9fr 1.3fr; gap: var(--s-7); margin-bottom: var(--s-5); align-items: start; }
+.footer-brand h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: var(--s-3); display: flex; align-items: center; gap: var(--s-3); line-height: 1.3; }
+.footer-brand .logo-img { width: 28px; height: 28px; flex-shrink: 0; }
+.footer-desc { font-size: 11px; color: var(--ink-3); line-height: 1.7; max-width: 360px; letter-spacing: 0.005em; }
+.footer-col-label { font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.15em; color: var(--ink-4); text-transform: uppercase; margin-bottom: var(--s-3); }
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: var(--s-2); font-size: 12px; font-weight: 500; }
+.footer-col a { transition: color 0.2s; }
+.footer-col a:hover { color: var(--ma12); }
+.footer-contact-list { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--ink-2); font-weight: 400; line-height: 1.5; }
+.footer-contact-row { display: flex; align-items: flex-start; gap: var(--s-2); }
+.footer-contact-row .icon { color: var(--ink-4); flex-shrink: 0; padding-top: 1px; font-size: 11px; }
+.footer-bottom { border-top: 1px solid var(--grid-line); padding-top: var(--s-4); }
+.footer-copyright { font-size: 10px; font-weight: 400; letter-spacing: 0.01em; color: var(--ink-3); line-height: 1.6; }
+
+.fade-in { animation: fadeIn 1s cubic-bezier(0.16,1,0.3,1) forwards; opacity: 0; transform: translateY(20px); }
+.delay-1 { animation-delay: 0.15s; }
+.delay-2 { animation-delay: 0.30s; }
+@keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 1024px) {
+  .nav-right { display: none; }
+  .nav-left { width: 100%; padding: 0 var(--s-5); }
+  .first-screen { height: auto; min-height: 0; }
+  .hero { flex-direction: column; }
+  .hero-left, .hero-right { width: 100%; padding: var(--s-7) var(--s-5); }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .stats-row .stat-card:nth-child(2) { border-right: none; }
+  .stats-row .stat-card:nth-child(1), .stats-row .stat-card:nth-child(2) { border-bottom: 1px solid var(--grid-line); }
+  .philo { flex-direction: column; }
+  .philo-left, .philo-right { width: 100%; padding: var(--s-7) var(--s-5); }
+  .philo-left { border-right: none; border-bottom: 1px solid var(--grid-line); }
+  .footer { padding: var(--s-6) var(--s-5); }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--s-5); }
+  .footer-brand { grid-column: 1 / -1; }
+  .ohlc-bar { font-size: 9px; gap: 6px; }
+  .ohlc-bar .ma-legend { width: 100%; margin-left: 0; margin-top: 4px; }
+  .chart-watermark { font-size: 36px; }
+  .logo-text { font-size: 15px; }
+}
+@media (max-width: 640px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .stats-row .stat-card { border-right: none !important; border-bottom: 1px solid var(--grid-line); min-height: 140px; }
+  .footer-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-left">
+    <div class="logo-block">
+      <img src="/docs/inbox/cover.jpeg" alt="Scorpius Capital" class="logo-img"/>
+      <div class="logo-text" data-i18n="brand_name">心宿资本（美国）集团有限公司</div>
+    </div>
+    <button class="lang-btn" id="langToggle">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span id="langLabel">EN</span>
+    </button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="<https://scorpiuscapitalgroup.com/#/documents/holdings/>" class="nav-link" data-i18n="nav_philo">持仓列表</a>
+      <a href="<https://scorpiuscapitalgroup.com/#/documents/financial-statements/>" class="nav-link" data-i18n="nav_track">财务报表</a>
+      <a href="<https://scorpiuscapitalgroup.com/#/documents/forecasts/>" class="nav-link" data-i18n="nav_log">分析研报</a>
+    </div>
+    <a href="#contact" class="nav-cta">
+      <span data-i18n="nav_contact">关于我们</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- ==== FIRST SCREEN ==== -->
+<div class="first-screen">
+<section class="hero">
+  <div class="hero-left">
+    <div class="fade-in">
+      <h2 class="hero-title" id="heroTitle">
+        <span data-i18n="hero_title_1">长期主义，</span><br/>
+        <span class="accent" data-i18n="hero_title_2">集中持有。</span>
+      </h2>
+      <p class="hero-desc" data-i18n="hero_desc">心宿资本是一家自营投资机构，专注于美国上市公司股票及相关衍生品的长期持有。我们以自有资本进行投资，不向任何第三方募集资金，不提供投资咨询或代客理财服务。</p>
+      <a href="#philosophy" class="hero-cta fade-in delay-1">
+        <span data-i18n="hero_btn">查看投资理念</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="chart-header fade-in delay-1">
+      <div style="display:flex;align-items:center;">
+        <div class="chart-symbol">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          SCORP.CAPITAL
+        </div>
+        <span class="chart-tag" id="chartTag" data-i18n="chart_tag">资金规模 · 年度</span>
+      </div>
+      <div class="chart-live"><span class="live-dot"></span> <span data-i18n="chart_live">数据 · 公司年度披露</span></div>
+    </div>
+    <div class="chart-wrap fade-in delay-2" id="chartWrap">
+      <div class="chart-watermark">SCORPIUS</div>
+      <div class="ohlc-bar" id="ohlcBar"></div>
+      <svg id="chartSvg" viewBox="0 0 800 400" preserveAspectRatio="none" style="width:100%;height:100%;position:absolute;inset:0;display:block;"></svg>
+      <div class="y-axis" id="yAxis"></div>
+      <div class="x-axis" id="xAxis"></div>
+      <div class="x-cross-label" id="crossXLabel"><div></div></div>
+    </div>
+    <div class="chart-stats fade-in delay-2">
+      <div>
+        <div class="stat-label" data-i18n="chart_nav">最新资金规模</div>
+        <div class="stat-value" id="navValue">—</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="stat-label" data-i18n="chart_ret">期间累计</div>
+        <div class="stat-value gold" id="retValue">—</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-row">
+  <div class="stat-card">
+    <span class="stat-index">/ 01</span>
+    <div class="stat-card-label" data-i18n="stat_year_title">成立年份</div>
+    <div class="stat-card-value" data-i18n="stat_year_value">已成立 1 年</div>
+    <div class="stat-card-desc" data-i18n="stat_year_desc">成立于 2026.04.13 · 自营投资机构</div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-index">/ 02</span>
+    <div class="stat-card-label" data-i18n="stat_focus_title">慈善事业</div>
+    <div class="stat-card-value" data-i18n="stat_focus_value">CSR · 筹建中</div>
+    <div class="stat-card-desc" data-i18n="stat_focus_desc">教育援助 · 公益基金 · 长期回馈</div>
+  </div>
+  <div class="stat-card">
+    <span class="stat-index">/ 03</span>
+    <div class="stat-card-label" data-i18n="stat_pos_title">同时持仓</div>
+    <div class="stat-card-value numeric">≤8</div>
+    <div class="stat-card-desc" data-i18n="stat_pos_desc">自有资本 · 100% 自营</div>
+  </div>
+  <a href="<https://scorpiuscapitalgroup.com/#/documents/forecasts/>" class="stat-card dark">
+    <span class="stat-index">/ 04</span>
+    <div class="stat-card-label" data-i18n="stat_log_title">分析研报</div>
+    <div class="stat-card-cta-bottom">
+      <div class="stat-card-desc" data-i18n="stat_log_desc">阅读 2026 年度展望</div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B59049" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </div>
+  </a>
+</section>
+</div><!-- /.first-screen -->
+
+<!-- Philosophy -->
+<section class="philo" id="philosophy">
+  <div class="philo-left">
+    <h2 class="philo-title" id="philoTitle">
+      <span data-i18n="philo_title_1">研究驱动</span><br/>
+      <span class="accent" data-i18n="philo_title_2">投资决策。</span>
+    </h2>
+    <p class="philo-desc" data-i18n="philo_desc">我们相信少数经过深入研究的投资机会，长期能够带来超越市场的回报。投资组合保持高度集中，换手率极低。我们尊重商业本身的运行规律，也接受作为投资者必然面对的局限——能看清的地方才下注，看不清的地方就等待。</p>
+  </div>
+  <div class="philo-right">
+    <div class="philo-card">
+      <div class="philo-num">01</div>
+      <div class="philo-card-content">
+        <h3 class="philo-card-title" data-i18n="philo_1_title">研究优先</h3>
+        <p class="philo-card-en">Research First</p>
+        <p class="philo-card-desc" data-i18n="philo_1_desc">投资决策建立在对商业模式、竞争格局与长期价值的完整理解之上。我们不参与无法用基本面解释的交易。</p>
+      </div>
+    </div>
+    <div class="philo-card">
+      <div class="philo-num">02</div>
+      <div class="philo-card-content">
+        <h3 class="philo-card-title" data-i18n="philo_2_title">长期持有</h3>
+        <p class="philo-card-en">Long-Term Ownership</p>
+        <p class="philo-card-desc" data-i18n="philo_2_desc">我们以"年"为单位衡量持有周期。买入一家公司，意味着愿意陪它穿越完整的商业周期，而不是为下一个季报下注。</p>
+      </div>
+    </div>
+    <div class="philo-card">
+      <div class="philo-num">03</div>
+      <div class="philo-card-content">
+        <h3 class="philo-card-title" data-i18n="philo_3_title">风险敬畏</h3>
+        <p class="philo-card-en">Risk Discipline</p>
+        <p class="philo-card-desc" data-i18n="philo_3_desc">不使用高杠杆，不在缺乏研究依据的情况下交易。资本保全是长期复利的前提。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer" id="contact">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <h1><img src="/docs/inbox/cover.jpeg" alt="Scorpius Capital" class="logo-img"/> <span data-i18n="brand_name">心宿资本（美国）集团有限公司</span></h1>
+      <p class="footer-desc" data-i18n="footer_desc">本网站所载内容仅供一般信息参考之用，不构成任何形式的投资建议、要约、招揽或推荐。心宿资本不向公众募集资金，不提供投资咨询或代客理财服务。本网站所提及的任何标的均不构成买卖建议。所有投资均存在风险，过往业绩不代表未来表现，投资者可能损失全部本金。</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-label" data-i18n="footer_about">关于</p>
+      <ul>
+        <li><a href="<https://scorpiuscapitalgroup.com/#/documents/holdings/>" data-i18n="nav_philo">持仓列表</a></li>
+        <li><a href="<https://scorpiuscapitalgroup.com/#/documents/financial-statements/>" data-i18n="nav_track">财务报表</a></li>
+        <li><a href="<https://scorpiuscapitalgroup.com/#/documents/forecasts/>" data-i18n="nav_log">分析研报</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-label" data-i18n="footer_legal">声明</p>
+      <ul>
+        <li><a href="#" data-i18n="footer_self">自营声明</a></li>
+        <li><a href="#" data-i18n="footer_privacy">隐私政策</a></li>
+        <li><a href="#" data-i18n="footer_terms">使用条款</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-label" data-i18n="footer_contact">联系我们</p>
+      <div class="footer-contact-list">
+        <div class="footer-contact-row"><span class="icon">✉</span><span>support@scorpiuscapitalgroup.com</span></div>
+        <div class="footer-contact-row"><span class="icon">☎</span><span>+1 929 277 7776<br/>+1 369 333 3321</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copyright" id="footerCopyright">© 2026 SCORPIUS CAPITAL GROUP LLC. 保留所有权利。本网站由心宿资本（美国）集团有限公司发布与维护，"心宿资本"、"SCORPIUS CAPITAL GROUP" 及相关标识为本公司所有。本网站所载内容受版权法保护，未经书面授权不得复制、转载或用于商业用途。</p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   K 线数据来源：同目录 data.csv
+   格式（第一行表头必须保留）：
+   year,capital
+   2026,3000000
+   2027,4500000
+   ============================================================ */
+
+const i18n = {
+  CN: {
+    brand_name:"心宿资本（美国）集团有限公司",
+    nav_philo:"持仓列表", nav_track:"财务报表", nav_log:"分析研报", nav_contact:"关于我们",
+    hero_title_1:"长期主义，", hero_title_2:"集中持有。",
+    hero_desc:"心宿资本是一家自营投资机构，专注于美国上市公司股票及相关衍生品的长期持有。我们以自有资本进行投资，不向任何第三方募集资金，不提供投资咨询或代客理财服务。",
+    hero_btn:"查看投资理念",
+    chart_tag:"资金规模 · 年度", chart_live:"数据 · 公司年度披露",
+    chart_nav:"最新资金规模", chart_ret:"期间累计",
+    stat_year_title:"成立年份", stat_year_value:"已成立 1 年", stat_year_desc:"成立于 2026.04.13 · 自营投资机构",
+    stat_focus_title:"慈善事业", stat_focus_value:"CSR · 筹建中", stat_focus_desc:"教育援助 · 公益基金 · 长期回馈",
+    stat_pos_title:"同时持仓", stat_pos_desc:"自有资本 · 100% 自营",
+    stat_log_title:"分析研报", stat_log_desc:"阅读 2026 年度展望",
+    philo_title_1:"研究驱动", philo_title_2:"投资决策。",
+    philo_desc:"我们相信少数经过深入研究的投资机会，长期能够带来超越市场的回报。投资组合保持高度集中，换手率极低。我们尊重商业本身的运行规律，也接受作为投资者必然面对的局限——能看清的地方才下注，看不清的地方就等待。",
+    philo_1_title:"研究优先", philo_1_desc:"投资决策建立在对商业模式、竞争格局与长期价值的完整理解之上。我们不参与无法用基本面解释的交易。",
+    philo_2_title:"长期持有", philo_2_desc:"我们以\\"年\\"为单位衡量持有周期。买入一家公司，意味着愿意陪它穿越完整的商业周期，而不是为下一个季报下注。",
+    philo_3_title:"风险敬畏", philo_3_desc:"不使用高杠杆，不在缺乏研究依据的情况下交易。资本保全是长期复利的前提。",
+    footer_about:"关于", footer_legal:"声明", footer_contact:"联系我们",
+    footer_self:"自营声明", footer_privacy:"隐私政策", footer_terms:"使用条款",
+    footer_desc:"本网站所载内容仅供一般信息参考之用，不构成任何形式的投资建议、要约、招揽或推荐。心宿资本不向公众募集资金，不提供投资咨询或代客理财服务。本网站所提及的任何标的均不构成买卖建议。所有投资均存在风险，过往业绩不代表未来表现，投资者可能损失全部本金。",
+    footer_copyright:"© 2026 SCORPIUS CAPITAL GROUP LLC. 保留所有权利。本网站由心宿资本（美国）集团有限公司发布与维护，\\"心宿资本\\"、\\"SCORPIUS CAPITAL GROUP\\" 及相关标识为本公司所有。本网站所载内容受版权法保护，未经书面授权不得复制、转载或用于商业用途。"
+  },
+  EN: {
+    brand_name:"SCORPIUS CAPITAL GROUP LLC",
+    nav_philo:"Holdings", nav_track:"Financials", nav_log:"Research", nav_contact:"About Us",
+    hero_title_1:"LONG-TERM,", hero_title_2:"CONCENTRATED.",
+    hero_desc:"Scorpius Capital is a proprietary investment firm focused on long-term ownership of U.S. listed equities and related derivatives. We invest our own capital. We do not raise outside funds, and we do not provide investment advisory or asset management services to any third party.",
+    hero_btn:"OUR APPROACH",
+    chart_tag:"AUM · ANNUAL", chart_live:"DATA · ANNUAL DISCLOSURE",
+    chart_nav:"Latest AUM", chart_ret:"Cumulative",
+    stat_year_title:"Founded", stat_year_value:"YEAR 1", stat_year_desc:"Established Apr 13, 2026 · Proprietary Firm",
+    stat_focus_title:"Philanthropy", stat_focus_value:"CSR · In Planning", stat_focus_desc:"Education · Public Good · Long-term Impact",
+    stat_pos_title:"Concurrent Positions", stat_pos_desc:"Own Capital · 100% Proprietary",
+    stat_log_title:"Research", stat_log_desc:"Read 2026 Annual Outlook",
+    philo_title_1:"RESEARCH-DRIVEN", philo_title_2:"DECISIONS.",
+    philo_desc:"We believe a small number of thoroughly researched ideas can deliver returns above the broad market over time. The portfolio is highly concentrated and turnover is low. We respect the way businesses actually compound, and we accept the limits of what any investor can know — we deploy capital where we can see clearly, and we wait when we cannot.",
+    philo_1_title:"Research First", philo_1_desc:"Every position rests on a complete understanding of the business model, competitive landscape and long-term economics. We do not participate in trades we cannot explain on fundamentals.",
+    philo_2_title:"Long-Term Ownership", philo_2_desc:"We measure holding periods in years. Owning a company means being willing to sit through a full business cycle — not betting on the next quarter's print.",
+    philo_3_title:"Risk Discipline", philo_3_desc:"No structural leverage. No positions taken without a research thesis. Preserving capital is the precondition for long-term compounding.",
+    footer_about:"About", footer_legal:"Legal", footer_contact:"Contact",
+    footer_self:"Prop Statement", footer_privacy:"Privacy Policy", footer_terms:"Terms of Use",
+    footer_desc:"The content on this website is provided for general informational purposes only and does not constitute investment advice, an offer, a solicitation, or a recommendation of any kind. Scorpius Capital does not solicit funds from the public and does not provide investment advisory or asset management services. References to any security do not constitute a buy or sell recommendation. All investments involve risk; past performance is not indicative of future results, and investors may lose all of their principal.",
+    footer_copyright:"© 2026 SCORPIUS CAPITAL GROUP LLC. All rights reserved. This website is published and maintained by Scorpius Capital Group LLC. \\"Scorpius Capital\\", \\"SCORPIUS CAPITAL GROUP\\" and related marks are the property of the firm. All content on this site is protected by copyright law and may not be reproduced, redistributed, or used for commercial purposes without prior written consent."
+  }
+};
+
+let lang = 'CN';
+let yearlyAssetData = [];
+let ma20 = [];
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (i18n[lang][k]) el.innerHTML = i18n[lang][k];
+  });
+  document.getElementById('langLabel').textContent = lang === 'CN' ? 'EN' : '中';
+  const heroTitle = document.getElementById('heroTitle');
+  const philoTitle = document.getElementById('philoTitle');
+  if (lang === 'EN') { heroTitle.classList.add('en'); philoTitle.classList.add('en'); }
+  else { heroTitle.classList.remove('en'); philoTitle.classList.remove('en'); }
+  const cr = document.getElementById('footerCopyright');
+  if (cr) cr.textContent = i18n[lang].footer_copyright;
+  if (yearlyAssetData.length > 0) updateOhlc(yearlyAssetData.length - 1);
+}
+document.getElementById('langToggle').addEventListener('click', () => { lang = lang === 'CN' ? 'EN' : 'CN'; applyLang(); });
+
+/* ============================================================
+   CSV 解析 + 数据加载
+   ============================================================ */
+function parseCSV(text) {
+  const lines = text.trim().split(/\\r?\\n/).filter(l => l.trim() && !l.trim().startsWith('#'));
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(',').map(s => s.trim());
+    if (parts.length < 2) continue;
+    const year = parts[0];
+    const capital = parseFloat(parts[1]);
+    if (!year || isNaN(capital)) continue;
+    rows.push({ year, capital });
+  }
+  return rows;
+}
+
+function buildOHLC(rows) {
+  // 由 [{year, capital}] -> [{year, open, high, low, close}]
+  // open = 上一年的 capital（首年 open = 0.7 * capital）
+  // close = 当年 capital
+  // high = max(open, close) * (1 + 浮动)，low = min(open, close) * (1 - 浮动)
+  // 浮动幅度根据涨跌幅自适应
+  const out = [];
+  rows.forEach((r, i) => {
+    const open = i === 0 ? r.capital * 0.7 : rows[i-1].capital;
+    const close = r.capital;
+    const swing = Math.max(Math.abs(close - open) * 0.35, Math.max(open, close) * 0.06);
+    const high = Math.max(open, close) + swing;
+    const low  = Math.max(0, Math.min(open, close) - swing);
+    out.push({ year: r.year, open, high, low, close });
+  });
+  return out;
+}
+
+async function loadData() {
+  try {
+    const res = await fetch('data.csv', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    if (rows.length === 0) throw new Error('CSV 无有效数据行');
+    yearlyAssetData = buildOHLC(rows);
+    ma20 = computeEMA(20);
+    buildChart();
+  } catch (err) {
+    showChartError(err.message);
+  }
+}
+
+function showChartError(msg) {
+  const wrap = document.getElementById('chartWrap');
+  const tipCN = '无法加载 <code>data.csv</code>。请确认同目录下存在该文件，且通过 HTTP 服务访问（不能直接双击 html 打开）。';
+  const tipEN = 'Unable to load <code>data.csv</code>. Make sure the file exists and the page is served over HTTP.';
+  wrap.innerHTML = '<div class="chart-error"><div style="font-weight:700;color:var(--ink);">⚠ ' + msg + '</div><div>' + (lang==='CN'?tipCN:tipEN) + '</div></div>';
+}
+
+/* ============================================================
+   图表渲染（与之前一致，只是数据来自 yearlyAssetData）
+   ============================================================ */
+const SVG_W = 800, SVG_H = 400;
+const PAD = { top: 50, right: 56, bottom: 24, left: 0 };
+const innerW = SVG_W - PAD.left - PAD.right;
+const innerH = SVG_H - PAD.top - PAD.bottom;
+const priceH = innerH;
+
+function getRange() {
+  const minP = Math.min.apply(null, yearlyAssetData.map(d => d.low)) * 0.92;
+  const maxP = Math.max.apply(null, yearlyAssetData.map(d => d.high)) * 1.08;
+  return { minP, maxP, range: maxP - minP };
+}
+function getCandleW() { return innerW / yearlyAssetData.length; }
+function getX(i) { return PAD.left + i * getCandleW() + getCandleW() / 2; }
+function getY(p) { const r = getRange(); return PAD.top + priceH - ((p - r.minP) / r.range) * priceH; }
+
+function computeEMA(period) {
+  const k = 2 / (period + 1);
+  const out = [];
+  let prev = null;
+  yearlyAssetData.forEach((d, i) => {
+    if (i === 0) { prev = d.close; out.push(prev); }
+    else { prev = d.close * k + prev * (1 - k); out.push(prev); }
+  });
+  return out;
+}
+
+function fmtMoney(v) {
+  // 大数字格式化：千分位 + 简写
+  if (v >= 1e9) return (v/1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return (v/1e6).toFixed(2) + 'M';
+  if (v >= 1e4) return (v/1e4).toFixed(1) + 'W';
+  if (v >= 1e3) return (v/1e3).toFixed(1) + 'K';
+  return v.toFixed(0);
+}
+function fmtFull(v) {
+  return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+function buildChart() {
+  const svg = document.getElementById('chartSvg');
+  const candleW = getCandleW();
+  let html = '';
+
+  html += '<g opacity="0.04">';
+  for (let i = 0; i <= 7; i++) {
+    const y = PAD.top + (i / 7) * priceH;
+    html += '<line x1="0" y1="' + y + '" x2="' + innerW + '" y2="' + y + '" stroke="#14201C"/>';
+  }
+  for (let i = 0; i <= yearlyAssetData.length; i++) {
+    const x = (i / yearlyAssetData.length) * innerW;
+    html += '<line x1="' + x + '" y1="' + PAD.top + '" x2="' + x + '" y2="' + (PAD.top + priceH) + '" stroke="#14201C"/>';
+  }
+  html += '</g>';
+
+  if (yearlyAssetData.length >= 3) {
+    let path = ''; let started = false;
+    ma20.forEach((v, i) => {
+      if (v != null) { path += (started ? 'L' : 'M') + ' ' + getX(i) + ' ' + getY(v) + ' '; started = true; }
+    });
+    html += '<path d="' + path + '" fill="none" stroke="#B59049" stroke-width="1.75" stroke-linejoin="round" opacity="0.9"/>';
+  }
+
+  yearlyAssetData.forEach((d, i) => {
+    const x = getX(i);
+    const isUp = d.close >= d.open;
+    const color = isUp ? '#3E6B4F' : '#9C4332';
+    const ry = Math.min(getY(d.open), getY(d.close));
+    const rh = Math.max(Math.abs(getY(d.open) - getY(d.close)), 2);
+    const rw = Math.max(candleW * 0.55, 4);
+    html += '<line x1="' + x + '" y1="' + getY(d.high) + '" x2="' + x + '" y2="' + getY(d.low) + '" stroke="' + color + '" stroke-width="1.5"/>';
+    html += '<rect x="' + (x - rw/2) + '" y="' + ry + '" width="' + rw + '" height="' + rh + '" fill="' + color + '" stroke="' + color + '" stroke-width="1"/>';
+  });
+
+  html += '<g id="crossGroup"></g>';
+  svg.innerHTML = html;
+
+  const yAxis = document.getElementById('yAxis');
+  const r = getRange();
+  let yh = '';
+  for (let i = 0; i <= 7; i++) {
+    const ratio = i / 7;
+    const price = r.maxP - r.range * ratio;
+    const topPct = ((PAD.top + priceH * ratio) / SVG_H) * 100;
+    yh += '<div class="y-tick" style="top:' + topPct + '%;">' + fmtMoney(price) + '</div>';
+  }
+  yh += '<div class="y-cross-label" id="crossYLabel"></div>';
+  yAxis.innerHTML = yh;
+
+  const xAxis = document.getElementById('xAxis');
+  if (yearlyAssetData.length >= 3) {
+    xAxis.innerHTML = '<span>' + yearlyAssetData[0].year + '</span><span>' + yearlyAssetData[Math.floor(yearlyAssetData.length/2)].year + '</span><span>' + yearlyAssetData[yearlyAssetData.length-1].year + '</span>';
+  } else if (yearlyAssetData.length === 2) {
+    xAxis.innerHTML = '<span>' + yearlyAssetData[0].year + '</span><span>' + yearlyAssetData[1].year + '</span>';
+  } else if (yearlyAssetData.length === 1) {
+    xAxis.innerHTML = '<span>' + yearlyAssetData[0].year + '</span>';
+  }
+
+  const last = yearlyAssetData[yearlyAssetData.length-1];
+  const first = yearlyAssetData[0];
+  document.getElementById('navValue').textContent = fmtFull(last.close);
+  const totalReturn = ((last.close / first.open - 1) * 100);
+  document.getElementById('retValue').textContent = (totalReturn >= 0 ? '+' : '') + totalReturn.toFixed(0) + '%';
+
+  updateOhlc(yearlyAssetData.length - 1);
+}
+
+function updateOhlc(idx) {
+  const d = yearlyAssetData[idx];
+  if (!d) return;
+  const prev = idx > 0 ? yearlyAssetData[idx-1] : null;
+  const isUp = d.close >= d.open;
+  const colorStyle = isUp ? 'color:#3E6B4F' : 'color:#9C4332';
+  const change = prev ? ((d.close - prev.close) / prev.close * 100) : 0;
+  const changeStr = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
+  const yoy = ((d.close - d.open) / d.open * 100);
+  const yoyStr = (yoy >= 0 ? '+' : '') + yoy.toFixed(1) + '%';
+  const labels = lang === 'CN'
+    ? { y:'年初', h:'峰值', l:'谷底', c:'年末', cy:'年内', yoy:'同比' }
+    : { y:'OPEN', h:'HIGH', l:'LOW', c:'CLOSE', cy:'YR', yoy:'YOY' };
+  document.getElementById('ohlcBar').innerHTML =
+    '<span style="font-weight:700;color:#14201C;">' + d.year + '</span>' +
+    '<span class="label">' + labels.y + ' <span style="' + colorStyle + '">' + fmtMoney(d.open) + '</span></span>' +
+    '<span class="label">' + labels.h + ' <span style="' + colorStyle + '">' + fmtMoney(d.high) + '</span></span>' +
+    '<span class="label">' + labels.l + ' <span style="' + colorStyle + '">' + fmtMoney(d.low) + '</span></span>' +
+    '<span class="label">' + labels.c + ' <span style="' + colorStyle + '">' + fmtMoney(d.close) + '</span></span>' +
+    '<span class="label">' + labels.cy + ' <span style="' + colorStyle + '">' + yoyStr + '</span></span>' +
+    '<span class="label">' + labels.yoy + ' <span style="' + colorStyle + '">' + changeStr + '</span></span>' +
+    (yearlyAssetData.length >= 3 ? '<span class="ma-legend"><span class="ma-tag"><span class="ma-dot" style="background:#B59049;"></span><span style="color:#B59049;">EMA20 ' + (ma20[idx]?fmtMoney(ma20[idx]):'-') + '</span></span></span>' : '');
+}
+
+const chartWrap = document.getElementById('chartWrap');
+chartWrap.addEventListener('mousemove', e => {
+  if (yearlyAssetData.length === 0) return;
+  const rect = chartWrap.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * SVG_W;
+  const sy = (e.clientY - rect.top) / rect.height * SVG_H;
+  if (sx < PAD.left || sx > SVG_W - PAD.right || sy < PAD.top || sy > SVG_H - PAD.bottom) return;
+  const candleW = getCandleW();
+  const idx = Math.min(Math.max(Math.floor((sx - PAD.left) / candleW), 0), yearlyAssetData.length - 1);
+  const cx = getX(idx);
+  const clampedY = Math.min(Math.max(sy, PAD.top), PAD.top + priceH);
+  const r = getRange();
+  const price = r.minP + ((PAD.top + priceH - clampedY) / priceH) * r.range;
+  const cg = document.getElementById('crossGroup');
+  if (cg) cg.innerHTML =
+    '<line x1="' + cx + '" y1="' + PAD.top + '" x2="' + cx + '" y2="' + (SVG_H - PAD.bottom) + '" stroke="#14201C" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>' +
+    '<line x1="' + PAD.left + '" y1="' + clampedY + '" x2="' + innerW + '" y2="' + clampedY + '" stroke="#14201C" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.5"/>';
+  updateOhlc(idx);
+  const xl = document.getElementById('crossXLabel');
+  if (xl) {
+    xl.style.display = 'flex';
+    xl.style.left = (cx / SVG_W * 100) + '%';
+    xl.style.transform = 'translateX(-50%)';
+    xl.firstElementChild.textContent = yearlyAssetData[idx].year;
+  }
+  const yl = document.getElementById('crossYLabel');
+  if (yl) {
+    yl.style.display = 'block';
+    yl.style.top = (clampedY / SVG_H * 100) + '%';
+    yl.textContent = fmtMoney(price);
+  }
+});
+chartWrap.addEventListener('mouseleave', () => {
+  if (yearlyAssetData.length === 0) return;
+  const cg = document.getElementById('crossGroup');
+  if (cg) cg.innerHTML = '';
+  const xl = document.getElementById('crossXLabel');
+  if (xl) xl.style.display = 'none';
+  const yl = document.getElementById('crossYLabel');
+  if (yl) yl.style.display = 'none';
+  updateOhlc(yearlyAssetData.length - 1);
+});
+
+applyLang();
+loadData();
+
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('scrollProgress').style.width = pct + '%';
+});
+</script>
+</body>
+</html>
