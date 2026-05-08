@@ -1,10 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>心宿资本（美国）集团有限公司 · SCORPIUS CAPITAL GROUP</title>
+
+<!-- 你的全局样式 -->
+<link rel="stylesheet" href="/docs/inbox/site.css"/>
+
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -71,7 +74,6 @@ body {
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; background: none; border: none; color: inherit; }
 .font-mono { font-family: var(--font-mono); font-feature-settings: "tnum" 1; }
-.section-num { font-family: var(--font-mono); font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.3em; color: var(--ink-4); }
 .scroll-progress { position: fixed; top: 0; left: 0; height: 2px; background: var(--ma12); z-index: 100; transition: width 0.1s; width: 0%; }
 
 /* === NAV === */
@@ -126,8 +128,6 @@ button { font-family: inherit; cursor: pointer; background: none; border: none; 
 .stat-label { font-size: var(--t-xs); font-weight: 500; letter-spacing: 0.08em; color: var(--ink-3); margin-bottom: var(--s-2); }
 .stat-value { font-family: var(--font-mono); font-size: 22px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
 .stat-value.gold { color: var(--ma12); }
-.chart-error { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; padding: 20px; text-align: center; font-size: 13px; color: var(--ink-3); }
-.chart-error code { font-family: var(--font-mono); font-size: 11px; background: var(--paper-warm); padding: 2px 6px; }
 
 /* === STATS ROW === */
 .stats-row { flex: 0 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--paper); border-bottom: 1px solid var(--grid-line); }
@@ -216,6 +216,17 @@ button { font-family: inherit; cursor: pointer; background: none; border: none; 
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     K 线数据 · 直接编辑此处即可
+     格式：year,capital
+     第一行表头必须保留
+     ============================================================ -->
+<script type="text/csv" id="chart-data">
+year,capital
+2026,3000000
+</script>
+
 <div class="scroll-progress" id="scrollProgress"></div>
 
 <!-- Nav -->
@@ -266,7 +277,7 @@ button { font-family: inherit; cursor: pointer; background: none; border: none; 
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           SCORP.CAPITAL
         </div>
-        <span class="chart-tag" id="chartTag" data-i18n="chart_tag">资金规模 · 年度</span>
+        <span class="chart-tag" data-i18n="chart_tag">资金规模 · 年度</span>
       </div>
       <div class="chart-live"><span class="live-dot"></span> <span data-i18n="chart_live">数据 · 公司年度披露</span></div>
     </div>
@@ -395,14 +406,6 @@ button { font-family: inherit; cursor: pointer; background: none; border: none; 
 </footer>
 
 <script>
-/* ============================================================
-   K 线数据来源：同目录 data.csv
-   格式（第一行表头必须保留）：
-   year,capital
-   2026,3000000
-   2027,4500000
-   ============================================================ */
-
 const i18n = {
   CN: {
     brand_name:"心宿资本（美国）集团有限公司",
@@ -471,7 +474,7 @@ function applyLang() {
 document.getElementById('langToggle').addEventListener('click', () => { lang = lang === 'CN' ? 'EN' : 'CN'; applyLang(); });
 
 /* ============================================================
-   CSV 解析 + 数据加载
+   K 线数据：从内嵌 <script type="text/csv"> 读取
    ============================================================ */
 function parseCSV(text) {
   const lines = text.trim().split(/\\r?\\n/).filter(l => l.trim() && !l.trim().startsWith('#'));
@@ -488,11 +491,6 @@ function parseCSV(text) {
 }
 
 function buildOHLC(rows) {
-  // 由 [{year, capital}] -> [{year, open, high, low, close}]
-  // open = 上一年的 capital（首年 open = 0.7 * capital）
-  // close = 当年 capital
-  // high = max(open, close) * (1 + 浮动)，low = min(open, close) * (1 - 浮动)
-  // 浮动幅度根据涨跌幅自适应
   const out = [];
   rows.forEach((r, i) => {
     const open = i === 0 ? r.capital * 0.7 : rows[i-1].capital;
@@ -505,31 +503,17 @@ function buildOHLC(rows) {
   return out;
 }
 
-async function loadData() {
-  try {
-    const res = await fetch('data.csv', { cache: 'no-cache' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    const rows = parseCSV(text);
-    if (rows.length === 0) throw new Error('CSV 无有效数据行');
-    yearlyAssetData = buildOHLC(rows);
-    ma20 = computeEMA(20);
-    buildChart();
-  } catch (err) {
-    showChartError(err.message);
-  }
+function loadData() {
+  const node = document.getElementById('chart-data');
+  if (!node) return;
+  const text = node.textContent || '';
+  const rows = parseCSV(text);
+  if (rows.length === 0) return;
+  yearlyAssetData = buildOHLC(rows);
+  ma20 = computeEMA(20);
+  buildChart();
 }
 
-function showChartError(msg) {
-  const wrap = document.getElementById('chartWrap');
-  const tipCN = '无法加载 <code>data.csv</code>。请确认同目录下存在该文件，且通过 HTTP 服务访问（不能直接双击 html 打开）。';
-  const tipEN = 'Unable to load <code>data.csv</code>. Make sure the file exists and the page is served over HTTP.';
-  wrap.innerHTML = '<div class="chart-error"><div style="font-weight:700;color:var(--ink);">⚠ ' + msg + '</div><div>' + (lang==='CN'?tipCN:tipEN) + '</div></div>';
-}
-
-/* ============================================================
-   图表渲染（与之前一致，只是数据来自 yearlyAssetData）
-   ============================================================ */
 const SVG_W = 800, SVG_H = 400;
 const PAD = { top: 50, right: 56, bottom: 24, left: 0 };
 const innerW = SVG_W - PAD.left - PAD.right;
@@ -537,11 +521,15 @@ const innerH = SVG_H - PAD.top - PAD.bottom;
 const priceH = innerH;
 
 function getRange() {
+  if (yearlyAssetData.length === 1) {
+    const v = yearlyAssetData[0].close;
+    return { minP: v * 0.5, maxP: v * 1.5, range: v };
+  }
   const minP = Math.min.apply(null, yearlyAssetData.map(d => d.low)) * 0.92;
   const maxP = Math.max.apply(null, yearlyAssetData.map(d => d.high)) * 1.08;
   return { minP, maxP, range: maxP - minP };
 }
-function getCandleW() { return innerW / yearlyAssetData.length; }
+function getCandleW() { return innerW / Math.max(yearlyAssetData.length, 1); }
 function getX(i) { return PAD.left + i * getCandleW() + getCandleW() / 2; }
 function getY(p) { const r = getRange(); return PAD.top + priceH - ((p - r.minP) / r.range) * priceH; }
 
@@ -557,7 +545,6 @@ function computeEMA(period) {
 }
 
 function fmtMoney(v) {
-  // 大数字格式化：千分位 + 简写
   if (v >= 1e9) return (v/1e9).toFixed(2) + 'B';
   if (v >= 1e6) return (v/1e6).toFixed(2) + 'M';
   if (v >= 1e4) return (v/1e4).toFixed(1) + 'W';
@@ -624,7 +611,7 @@ function buildChart() {
   } else if (yearlyAssetData.length === 2) {
     xAxis.innerHTML = '<span>' + yearlyAssetData[0].year + '</span><span>' + yearlyAssetData[1].year + '</span>';
   } else if (yearlyAssetData.length === 1) {
-    xAxis.innerHTML = '<span>' + yearlyAssetData[0].year + '</span>';
+    xAxis.innerHTML = '<span style="margin:0 auto;">' + yearlyAssetData[0].year + '</span>';
   }
 
   const last = yearlyAssetData[yearlyAssetData.length-1];
@@ -712,5 +699,11 @@ window.addEventListener('scroll', () => {
   document.getElementById('scrollProgress').style.width = pct + '%';
 });
 </script>
+
+<!-- 你的全局脚本（顺序：先 loader，再业务，再特效） -->
+<script src="/docs/inbox/loader.js"></script>
+<script src="/docs/inbox/custom.js"></script>
+<script src="/docs/inbox/emojiCursor.js"></script>
+
 </body>
 </html>
