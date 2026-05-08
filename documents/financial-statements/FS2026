@@ -1,0 +1,213 @@
+        <h2>Statement of Financial Position</h2>
+        <figure class="table">
+          <table>
+            <tbody>
+              <tr>
+                <td>ASSETS</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Current Assets</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Cash and Cash Equivalents</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Total Current Assets</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Non-Current Assets</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Long-Term Equity Investments, at Cost</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Total Non-Current Assets</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>TOTAL ASSETS</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>LIABILITIES</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Total Liabilities</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>MEMBER'S EQUITY</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Member's Capital</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>TOTAL LIABILITIES AND MEMBER'S EQUITY</td>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </figure>
+        <h2>Statement of Operations</h2>
+        <figure class="table">
+          <table>
+            <tbody>
+              <tr>
+                <td>Investment Income</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Dividend Income</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Total Investment Income</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Operating Expenses</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Registered Agent &amp; Address Fees</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>State LLC Annual Fees / Franchise Tax</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Total Operating Expenses</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>NET INCOME</td>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </figure>
+        <h2>Statement of Cash Flows</h2>
+        <figure class="table">
+          <table>
+            <tbody>
+              <tr>
+                <td>Cash Flows from Operating Activities</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Net Income</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Net Cash from Operating Activities</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Cash Flows from Investing Activities</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Purchase of Long-Term Investments</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Net Cash used in Investing Activities</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Cash Flows from Financing Activities</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Member's Capital Contributions</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Net Cash from Financing Activities</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Net Change in Cash</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Cash at Beginning of Year</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Cash at End of Year</td>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </figure>
+        <h2>Statement of Changes in Member's Equity</h2>
+        <figure class="table">
+          <table>
+            <tbody>
+              <tr>
+                <td><strong>Balance, January 1, 2025</strong>
+                </td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Member's Contributions</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Net Income</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td><strong>Balance, December 31, 2025</strong>
+                </td>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </figure>
+        <h2>Schedule of Investments</h2>
+        <figure class="table">
+          <table>
+            <thead>
+              <tr>
+                <th><strong>Ticker</strong>
+                </th>
+                <th>Company Name</th>
+                <th><strong>Shares</strong>
+                </th>
+                <th><strong>Cost Basis (USD)</strong>
+                </th>
+                <th><strong>Acquisition Date</strong>
+                </th>
+                <th><strong>% of Portfolio</strong>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td colspan="3">Total</td>
+                <td colspan="2">&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </figure>
