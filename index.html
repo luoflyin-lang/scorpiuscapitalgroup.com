@@ -257,7 +257,7 @@ year,capital
       <a href="./docs/#/documents/financial-statements/" class="nav-link" data-i18n="nav_track">财务报表</a>
       <a href="./docs/#/documents/forecasts/" class="nav-link" data-i18n="nav_log">分析研报</a>
     </div>
-    <a href="#contact" class="nav-cta">
+    <a href="./docs/#/about-us/" class="nav-cta">
       <span data-i18n="nav_contact">关于我们</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
     </a>
@@ -292,7 +292,7 @@ year,capital
       <div class="chart-live"><span class="live-dot"></span> <span data-i18n="chart_live">数据 · 公司年度披露</span></div>
     </div>
     <div class="chart-wrap fade-in delay-2" id="chartWrap">
-      <div class="chart-watermark">SCORPIUS</div>
+      <div class="chart-watermark">虚拟数据</div>
       <div class="ohlc-bar" id="ohlcBar"></div>
       <svg id="chartSvg" viewBox="0 0 800 400" preserveAspectRatio="none" style="width:100%;height:100%;position:absolute;inset:0;display:block;"></svg>
       <div class="y-axis" id="yAxis"></div>
@@ -425,7 +425,7 @@ const i18n = {
     hero_btn:"查看投资理念",
     chart_tag:"资金规模 · 年度", chart_live:"数据 · 公司年度披露",
     chart_nav:"最新资金规模", chart_ret:"期间累计",
-    stat_year_title:"成立年份", stat_year_value:"已成立 1 年", stat_year_desc:"成立于 2026.04.13 · 自营投资机构",
+    stat_year_title:"成立年份", stat_year_value:"已成立 0 年", stat_year_desc:"成立于 2026.04.13 · 自营投资机构",
     stat_focus_title:"慈善事业", stat_focus_value:"CSR · 筹建中", stat_focus_desc:"教育援助 · 公益基金 · 长期回馈",
     stat_pos_title:"同时持仓", stat_pos_desc:"自有资本 · 100% 自营",
     stat_log_title:"分析研报", stat_log_desc:"阅读 2026 年度展望",
@@ -447,7 +447,7 @@ const i18n = {
     hero_btn:"OUR APPROACH",
     chart_tag:"AUM · ANNUAL", chart_live:"DATA · ANNUAL DISCLOSURE",
     chart_nav:"Latest AUM", chart_ret:"Cumulative",
-    stat_year_title:"Founded", stat_year_value:"YEAR 1", stat_year_desc:"Established Apr 13, 2026 · Proprietary Firm",
+    stat_year_title:"Founded", stat_year_value:"YEAR 0", stat_year_desc:"Established Apr 13, 2026 · Proprietary Firm",
     stat_focus_title:"Philanthropy", stat_focus_value:"CSR · In Planning", stat_focus_desc:"Education · Public Good · Long-term Impact",
     stat_pos_title:"Concurrent Positions", stat_pos_desc:"Own Capital · 100% Proprietary",
     stat_log_title:"Research", stat_log_desc:"Read 2026 Annual Outlook",
@@ -616,7 +616,7 @@ function buildChart() {
 
   const last = yearlyAssetData[yearlyAssetData.length-1];
   const first = yearlyAssetData[0];
-  document.getElementById('navValue').textContent = fmtFull(last.close);
+  document.getElementById('navValue').textContent = '0';
   const totalReturn = ((last.close / first.open - 1) * 100);
   document.getElementById('retValue').textContent = (totalReturn >= 0 ? '+' : '') + totalReturn.toFixed(0) + '%';
 
