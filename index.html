@@ -7,7 +7,7 @@
     <!-- 引入 Tailwind CSS 进行极速样式搭建 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 ECharts 用于绘制绚丽的K线图 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script> -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');    
         body {
@@ -67,12 +67,12 @@
     <main class="relative z-30 flex flex-col items-center justify-start h-full pt-[25vh] md:pt-[22vh] pointer-events-none px-4">
         <div class="text-center drop-shadow-2xl pointer-events-auto">
             <!-- 资金总额大数字 -->
-            <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight mb-6 md:mb-8 tabular-nums flex items-baseline justify-center flex-wrap gap-x-2">
+            <h1 class="hidden text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight mb-6 md:mb-8 tabular-nums flex items-baseline justify-center flex-wrap gap-x-2">
                 <span id="fund-value">20 881 348 194 014</span>
                 <span class="text-base sm:text-xl md:text-3xl font-medium">USD</span>
             </h1>
 
-            <button id="dev-btn" class="btn-ripple bg-white/90 backdrop-blur text-black px-6 py-3 md:px-8 md:py-3.5 text-sm md:text-base rounded-full font-semibold hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg flex items-center gap-2 mx-auto pointer-events-auto cursor-pointer">
+            <button id="dev-btn" class="hidden btn-ripple bg-white/90 backdrop-blur text-black px-6 py-3 md:px-8 md:py-3.5 text-sm md:text-base rounded-full font-semibold hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg flex items-center gap-2 mx-auto pointer-events-auto cursor-pointer">
                 <span id="label-value-dev">Value development</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>
@@ -80,7 +80,7 @@
     </main>
 
     <!-- 底部叠加的K线图容器，大幅拉高以提升视觉冲击力 -->
-    <div id="kline-chart" class="absolute bottom-10 left-0 w-full h-[55%] md:h-[65%] z-20 pointer-events-none"></div>
+    <div id="kline-chart" class="hidden absolute bottom-10 left-0 w-full h-[55%] md:h-[65%] z-20 pointer-events-none"></div>
 
     <!-- 底部版权信息页脚 -->
     <footer class="absolute bottom-0 left-0 w-full h-10 z-50 flex items-center justify-start px-4 md:px-10 bg-transparent border-t border-white/20 text-gray-400 text-[10px] md:text-xs tracking-wider font-light">
@@ -133,6 +133,7 @@
         let currentValue = 20881348194014;
         let stepCounter = 100; // 对应初始的 100 根K线
 
+        /*
         // --- ECharts K线图初始化 ---
         const chartDom = document.getElementById('kline-chart');
         const myChart = echarts.init(chartDom);
@@ -252,6 +253,7 @@
             });
 
         }, 1500);
+        */
 
         // --- 中英文切换逻辑 ---
         let isEnglish = true;
