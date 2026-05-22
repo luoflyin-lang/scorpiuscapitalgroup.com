@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scorpius Capital Group</title>
-    <!-- 引入 Tailwind CSS 进行极速样式搭建 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');    
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');    
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body class="relative w-full h-screen overflow-hidden bg-gray-900 text-white">
@@ -19,24 +16,24 @@
 
     <div class="absolute inset-0 z-10 bg-gradient-to-b from-black/50 via-black/10 to-black/80"></div>
 
-    <header class="absolute top-0 left-0 w-full z-50 flex items-center justify-between px-4 py-4 md:px-10 md:py-8 bg-transparent">
+    <header class="absolute top-0 w-full z-50 flex items-center justify-between px-4 py-4 md:px-10 md:py-8">
         <div class="flex items-center gap-3 md:gap-4">
-            <img src="docs/inbox/cover.jpeg" alt="Scorpius Capital Group Logo" class="w-10 h-10 md:w-12 md:h-12 rounded shadow-md object-cover">
+            <img src="docs/inbox/cover.jpeg" alt="Logo" class="w-8 h-8 md:w-10 md:h-10 rounded shadow-sm object-cover">
             <div class="text-sm md:text-xl font-bold tracking-tight whitespace-nowrap">
                 Scorpius Capital Group
             </div>
         </div>
 
         <div class="flex items-center text-xs md:text-sm font-medium">
-            <button id="lang-toggle-btn" class="hover:text-gray-300 transition flex items-center gap-2 bg-black/20 px-3 py-1.5 md:bg-transparent md:p-0 rounded-full backdrop-blur md:backdrop-filter-none cursor-pointer">     
+            <button class="hover:text-gray-300 transition flex items-center gap-2 bg-black/20 px-3 py-1.5 md:bg-transparent md:p-0 rounded-full backdrop-blur cursor-pointer">     
                 <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span id="lang-text-full" class="hidden sm:inline">English</span>
-                <span id="lang-text-short" class="sm:hidden">EN</span>
+                <span class="hidden sm:inline">English</span>
+                <span class="sm:hidden">EN</span>
             </button>
         </div>
     </header>
 
-    <footer class="absolute bottom-0 left-0 w-full h-10 z-50 flex items-center justify-start px-4 md:px-10 bg-transparent border-t border-white/20 text-gray-400 text-[10px] md:text-xs tracking-wider font-light">
+    <footer class="absolute bottom-0 w-full h-10 z-50 flex items-center px-4 md:px-10 border-t border-white/20 text-gray-400 text-[10px] md:text-xs tracking-wider font-light">
         &copy; 2026 Scorpius Capital Group. All rights reserved.
     </footer>
 
