@@ -31,9 +31,9 @@
     </header>
 
     <div class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
-        <div class="font-bold tracking-tighter flex items-baseline" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+        <div class="font-bold tracking-tighter flex items-baseline text-black drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
             <span class="text-4xl md:text-7xl lg:text-9xl" id="aum-ticker">0</span>
-            <span class="text-xl md:text-3xl lg:text-5xl ml-2 md:ml-4 tracking-normal">JPY</span>
+            <span class="text-xl md:text-3xl lg:text-5xl ml-2 md:ml-4 tracking-normal">XTS</span>
         </div>
     </div>
 
@@ -90,7 +90,7 @@ async function initTicker() {
 
             const formatted = Math.floor(currentValue)
                 .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                .replace(/\B(?=(\d{3})+(?!\d))/g, "\u2009");
 
             tickerEl.innerText = formatted;
             
