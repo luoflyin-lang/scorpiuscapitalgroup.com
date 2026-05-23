@@ -30,10 +30,78 @@
 
     </header>
 
+    <div class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
+        <div class="text-4xl md:text-7xl lg:text-9xl font-bold tracking-tighter" style="font-family: monospace;" id="aum-ticker">0</div>
+        <div class="text-sm md:text-xl text-gray-300 mt-2 md:mt-4 tracking-widest uppercase opacity-80">Total Assets Under Management (USD)</div>
+    </div>
+
     <footer class="absolute bottom-0 w-full h-10 z-50 flex items-center px-4 md:px-10 border-t border-white/20 text-gray-400 text-[10px] md:text-xs tracking-wider font-light">
         &copy; 2026 Scorpius Capital Group LLC. All rights reserved.
     </footer>
 </div>
 <iframe src="docs/index.html" class="w-full h-screen border-none block"></iframe>
+<script>
+async function initTicker() {
+    try {
+        const response = await fetch('aum.csv');
+        const text = await response.text();
+        
+        const lines = text.trim().split('\n').slice(1);
+        const data = lines.map(line => {
+            const [yearStr, valueStr] = line.split(',');
+            const year = parseInt(yearStr.trim());
+            const value = parseFloat(valueStr.trim());
+            // Target is end of the year (Dec 31, 23:59:59.999)
+            const timestamp = new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999)).getTime();
+            return { year, value, timestamp };
+        }).sort((a, b) => a.timestamp - b.timestamp);
+
+        if (data.length === 0) return;
+
+        const tickerEl = document.getElementById('aum-ticker');
+
+        function updateTicker() {
+            const now = Date.now();
+            let currentValue = 0;
+
+            if (now <= data[0].timestamp) {
+                const startOfYear = new Date(Date.UTC(data[0].year, 0, 1, 0, 0, 0, 0)).getTime();
+                if (now < startOfYear) {
+                    currentValue = 0;
+                } else {
+                    const ratio = (now - startOfYear) / (data[0].timestamp - startOfYear);
+                    currentValue = ratio * data[0].value;
+                }
+            } else if (now >= data[data.length - 1].timestamp) {
+                currentValue = data[data.length - 1].value;
+            } else {
+                for (let i = 0; i < data.length - 1; i++) {
+                    if (now >= data[i].timestamp && now < data[i+1].timestamp) {
+                        const start = data[i].timestamp;
+                        const end = data[i+1].timestamp;
+                        const ratio = (now - start) / (end - start);
+                        currentValue = data[i].value + ratio * (data[i+1].value - data[i].value);
+                        break;
+                    }
+                }
+            }
+
+            const formatted = Math.floor(currentValue)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+            tickerEl.innerText = formatted;
+            
+            requestAnimationFrame(updateTicker);
+        }
+
+        requestAnimationFrame(updateTicker);
+
+    } catch (e) {
+        console.error("Failed to load AUM data:", e);
+    }
+}
+initTicker();
+</script>
 </body>
 </html>
