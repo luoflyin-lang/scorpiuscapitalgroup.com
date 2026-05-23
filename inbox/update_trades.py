@@ -17,7 +17,6 @@ def fetch_and_update():
         fill_resp = requests.post(INFO_URL, json=fill_payload)
         fill_resp.raise_for_status()
         fills = fill_resp.json()
-        print(f"成功获取 {len(fills)} 条原始成交记录。")
     except Exception as e:
         print(f"获取交易记录失败: {e}")
         return
@@ -33,48 +32,36 @@ def fetch_and_update():
             coin = pos['position']['coin']
             lev = pos['position']['leverage']['value']
             leverage_map[coin] = lev
-        print(f"已获取当前持仓杠杆: {leverage_map}")
     except Exception as e:
-        print(f"获取杠杆信息失败 (将显示 N/A): {e}")
+        print(f"获取杠杆信息失败: {e}")
 
-    # 3. 读取现有文件，确定已有的最新记录时间
-    existing_hashes = set()
+    # 3. 读取现有文件
+    existing_timestamps = set()
     file_exists = os.path.exists(FILE_PATH)
-    
     if file_exists:
         try:
             with open(FILE_PATH, "r", encoding="utf-8") as f:
                 content = f.read()
-                # 提取表格中已存在的时间戳，用于去重
-                existing_hashes = set(re.findall(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", content))
-                print(f"检测到现有文件，包含 {len(existing_hashes)} 条历史记录。")
-        except Exception as e:
-            print(f"读取旧文件失败: {e}")
+                existing_timestamps = set(re.findall(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", content))
+        except:
+            pass
 
     # 4. 筛选新记录
     new_rows = []
     for fill in fills:
         direction = fill['dir']
-        # 只处理平仓交易
         if "Close" not in direction:
             continue
             
         dt = datetime.datetime.fromtimestamp(fill['time']/1000, tz=datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
-        
-        # 如果时间戳已存在，说明是旧数据，停止处理（API返回结果按时间倒序）
-        if dt in existing_hashes:
+        if dt in existing_timestamps:
             continue
             
         coin = fill['coin']
         px = float(fill['px'])
         sz = float(fill['sz'])
         pnl = float(fill.get('closedPnl', 0))
-        
-        # 杠杆：优先用当前持仓的，没有就尝试默认为10（或者你常用的倍数），或者留空
-        leverage = leverage_map.get(coin, 10) # 如果没有当前持仓，默认按10x算ROI，或者你可以改成其他
-        
-        close_px = f"{px}"
-        roi_str = "-"
+        leverage = leverage_map.get(coin, 10)
         
         is_long = "Long" in direction
         try:
@@ -83,29 +70,14 @@ def fetch_and_update():
             else:
                 calc_open_px = px + (pnl / sz)
             open_px = f"{calc_open_px:.4f}".rstrip('0').rstrip('.')
-            
-            # 计算 ROI
-            if calc_open_px > 0:
-                # 即使没有杠杆，我们也显示一个 ROI (基于默认杠杆)
-                margin = (calc_open_px * sz) / float(leverage)
-                roi = (pnl / margin) * 100
-                roi_str = f"{roi:.2f}%"
-                
-                new_rows.append(f"| {dt} | {coin} | {direction} | {open_px} | {close_px} | {leverage}x | {roi_str} |")
-        except Exception as e:
-            print(f"处理单条记录失败 ({dt} {coin}): {e}")
+            margin = (calc_open_px * sz) / float(leverage)
+            roi = (pnl / margin) * 100
+            roi_str = f"{roi:.2f}%"
+            new_rows.append(f"| {dt} | {coin} | {direction} | {open_px} | {px} | {leverage}x | {roi_str} |")
+        except:
             continue
 
-    if not new_rows:
-        print("没有发现需要更新的新平仓记录。")
-        return
-
-    # 5. 写入或追加文件
-    header = "# Hyperliquid 交易记录 (永久账本)\n\n"
-    header += f"**最后检查时间 (UTC):** {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-    header += "| 时间 (UTC) | 标的 | 方向 | 开仓价格 | 平仓价格 | 杠杆 | ROI |\n"
-    header += "|---|---|---|---|---|---|---|\n"
-
+    # 5. 获取所有数据行（新+旧）
     old_data_lines = []
     if file_exists:
         try:
@@ -116,16 +88,58 @@ def fetch_and_update():
         except:
             pass
 
-    # 合并：新记录在最上面
     all_data = new_rows + old_data_lines
+
+    # 6. 计算统计数据 (最近 100 笔)
+    stats_rows = all_data[:100]
+    wins = 0
+    losses = 0
+    total_roi = 0.0
+    profit_sum = 0.0
+    loss_sum = 0.0
     
+    for row in stats_rows:
+        parts = row.split("|")
+        if len(parts) < 8: continue
+        try:
+            roi_val = float(parts[7].replace("%", "").strip())
+            total_roi += roi_val
+            if roi_val > 0:
+                wins += 1
+                profit_sum += roi_val
+            elif roi_val < 0:
+                losses += 1
+                loss_sum += abs(roi_val)
+        except:
+            continue
+            
+    total_count = wins + losses
+    win_rate = f"{(wins / total_count * 100):.2f}%" if total_count > 0 else "0%"
+    # 盈亏比 = 平均盈利 / 平均亏损
+    avg_win = profit_sum / wins if wins > 0 else 0
+    avg_loss = loss_sum / losses if losses > 0 else 0
+    pl_ratio = f"{(avg_win / avg_loss):.2f}" if avg_loss > 0 else ("INF" if avg_win > 0 else "0.00")
+    
+    # 构建统计表格 (6列1行)
+    summary_table = "## 交易表现统计 (最近100笔)\n\n"
+    summary_table += "| 胜率 | 盈亏比 | 总ROI (累加) | 盈利笔数 | 亏损笔数 | 总计笔数 |\n"
+    summary_table += "|---|---|---|---|---|---|\n"
+    summary_table += f"| {win_rate} | {pl_ratio} | {total_roi:.2f}% | {wins} | {losses} | {total_count} |\n\n"
+
+    # 7. 写入文件
+    header = "# Hyperliquid 交易记录 (永久账本)\n\n"
+    header += f"**最后更新时间 (UTC):** {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+    
+    full_content = header + summary_table + "## 详细成交历史\n\n"
+    full_content += "| 时间 (UTC) | 标的 | 方向 | 开仓价格 | 平仓价格 | 杠杆 | ROI |\n"
+    full_content += "|---|---|---|---|---|---|---|\n"
+    for row in all_data:
+        full_content += row + "\n"
+        
     os.makedirs(os.path.dirname(FILE_PATH), exist_ok=True)
     with open(FILE_PATH, "w", encoding="utf-8") as f:
-        f.write(header)
-        for row in all_data:
-            f.write(row + "\n")
-            
-    print(f"更新成功！新增 {len(new_rows)} 条记录，当前总计 {len(all_data)} 条平仓记录。")
-        
+        f.write(full_content)
+    print(f"统计更新完成：胜率 {win_rate}, 总记录 {len(all_data)}")
+
 if __name__ == "__main__":
     fetch_and_update()
