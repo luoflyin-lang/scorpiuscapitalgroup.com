@@ -90,9 +90,9 @@ async function initTicker() {
 
             const formatted = Math.floor(currentValue)
                 .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, "\u200A");
+                .replace(/\B(?=(\d{3})+(?!\d))/g, "<span style='display:inline-block; width:0.12em;'></span>");
 
-            tickerEl.innerText = formatted;
+            tickerEl.innerHTML = formatted;
             
             requestAnimationFrame(updateTicker);
         }
