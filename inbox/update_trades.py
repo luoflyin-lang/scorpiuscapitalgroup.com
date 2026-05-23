@@ -17,6 +17,7 @@ def fetch_and_update():
         fill_resp = requests.post(INFO_URL, json=fill_payload)
         fill_resp.raise_for_status()
         fills = fill_resp.json()
+        print(f"成功获取 {len(fills)} 条原始成交记录。")
     except Exception as e:
         print(f"获取交易记录失败: {e}")
         return
@@ -32,6 +33,7 @@ def fetch_and_update():
             coin = pos['position']['coin']
             lev = pos['position']['leverage']['value']
             leverage_map[coin] = lev
+        print(f"已获取当前持仓杠杆: {leverage_map}")
     except Exception as e:
         print(f"获取杠杆信息失败 (将显示 N/A): {e}")
 
@@ -43,24 +45,23 @@ def fetch_and_update():
         try:
             with open(FILE_PATH, "r", encoding="utf-8") as f:
                 content = f.read()
-                # 使用正则表达式提取表格中的所有时间，作为简单的去重逻辑
-                # 假设每行的时间格式是 202X-XX-XX XX:XX:XX
+                # 提取表格中已存在的时间戳，用于去重
                 existing_hashes = set(re.findall(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", content))
+                print(f"检测到现有文件，包含 {len(existing_hashes)} 条历史记录。")
         except Exception as e:
-            print(f"读取旧文件失败，将重新创建: {e}")
+            print(f"读取旧文件失败: {e}")
 
     # 4. 筛选新记录
     new_rows = []
-    # Fills API 返回的是按时间倒序排列的 (最新的在前)
-    # 我们遍历一遍，只保留“平仓”且“不在已有记录中”的
     for fill in fills:
         direction = fill['dir']
+        # 只处理平仓交易
         if "Close" not in direction:
             continue
             
         dt = datetime.datetime.fromtimestamp(fill['time']/1000, tz=datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
         
-        # 如果时间戳已存在，说明是旧数据，停止处理（因为 API 是倒序的）
+        # 如果时间戳已存在，说明是旧数据，停止处理（API返回结果按时间倒序）
         if dt in existing_hashes:
             continue
             
@@ -68,7 +69,9 @@ def fetch_and_update():
         px = float(fill['px'])
         sz = float(fill['sz'])
         pnl = float(fill.get('closedPnl', 0))
-        leverage = leverage_map.get(coin, "N/A")
+        
+        # 杠杆：优先用当前持仓的，没有就尝试默认为10（或者你常用的倍数），或者留空
+        leverage = leverage_map.get(coin, 10) # 如果没有当前持仓，默认按10x算ROI，或者你可以改成其他
         
         close_px = f"{px}"
         roi_str = "-"
@@ -81,40 +84,39 @@ def fetch_and_update():
                 calc_open_px = px + (pnl / sz)
             open_px = f"{calc_open_px:.4f}".rstrip('0').rstrip('.')
             
-            if leverage != "N/A" and calc_open_px > 0:
+            # 计算 ROI
+            if calc_open_px > 0:
+                # 即使没有杠杆，我们也显示一个 ROI (基于默认杠杆)
                 margin = (calc_open_px * sz) / float(leverage)
                 roi = (pnl / margin) * 100
                 roi_str = f"{roi:.2f}%"
                 
-                # 保存为表格行
-                new_rows.append(f"| {dt} | {coin} | {direction} | {open_px} | {close_px} | {leverage} | {roi_str} |")
-        except:
+                new_rows.append(f"| {dt} | {coin} | {direction} | {open_px} | {close_px} | {leverage}x | {roi_str} |")
+        except Exception as e:
+            print(f"处理单条记录失败 ({dt} {coin}): {e}")
             continue
 
     if not new_rows:
-        print("没有发现新的成交记录。")
+        print("没有发现需要更新的新平仓记录。")
         return
 
     # 5. 写入或追加文件
-    # 我们把最新的放在最上面，所以逻辑是：表头 + 新行 + 旧行
-    
     header = "# Hyperliquid 交易记录 (永久账本)\n\n"
     header += f"**最后检查时间 (UTC):** {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}\n\n"
     header += "| 时间 (UTC) | 标的 | 方向 | 开仓价格 | 平仓价格 | 杠杆 | ROI |\n"
     header += "|---|---|---|---|---|---|---|\n"
 
-    # 提取旧文件中的纯数据行
     old_data_lines = []
     if file_exists:
         try:
             with open(FILE_PATH, "r", encoding="utf-8") as f:
                 for line in f:
-                    if line.startswith("| 20"): # 只匹配日期开头的行
+                    if line.startswith("| 20"):
                         old_data_lines.append(line.strip())
         except:
             pass
 
-    # 合并：新记录在旧记录之上
+    # 合并：新记录在最上面
     all_data = new_rows + old_data_lines
     
     os.makedirs(os.path.dirname(FILE_PATH), exist_ok=True)
@@ -123,7 +125,7 @@ def fetch_and_update():
         for row in all_data:
             f.write(row + "\n")
             
-    print(f"更新成功！新增 {len(new_rows)} 条记录，总计 {len(all_data)} 条记录。")
+    print(f"更新成功！新增 {len(new_rows)} 条记录，当前总计 {len(all_data)} 条平仓记录。")
         
 if __name__ == "__main__":
     fetch_and_update()
