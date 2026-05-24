@@ -24,7 +24,7 @@ class HyperliquidTracker:
             return []
 
     def parse_history(self):
-        """解析现有文件，提取历史记录时间戳"""
+        """解析现有文件，提取历史记录"""
         if not os.path.exists(FILE_PATH):
             return set(), []
         
@@ -32,9 +32,8 @@ class HyperliquidTracker:
             lines = f.readlines()
             
         data_lines = [l.strip() for l in lines if l.startswith("| 20")]
-        timestamps = {re.search(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", l).group() 
-                      for l in data_lines if re.search(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", l)}
-        return timestamps, data_lines
+        existing_rows = set(data_lines)
+        return existing_rows, data_lines
 
     def process_fill(self, fill):
         """处理单笔成交，使用固定 10 倍乘数计算 ROI"""
@@ -48,13 +47,17 @@ class HyperliquidTracker:
         elif direction.startswith("Close Short") or direction.startswith("Short >"):
             is_long = False
             is_close = True
-            
-        if not is_close:
-            return None
 
         dt = datetime.datetime.fromtimestamp(fill['time']/1000, tz=datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
         coin = fill['coin']
         px = float(fill['px'])
+        
+        if not is_close:
+            return {
+                "dt": dt, "coin": coin, "dir": direction,
+                "open": f"{px}", "close": "-", "roi_str": "-"
+            }
+
         pnl = float(fill.get('closedPnl', 0))
         
         # 确定实际平仓的数量
@@ -80,7 +83,7 @@ class HyperliquidTracker:
             return {
                 "dt": dt, "coin": coin, "dir": direction,
                 "open": f"{open_px_val:.4f}".rstrip('0').rstrip('.'),
-                "close": f"{px}", "roi": roi
+                "close": f"{px}", "roi_str": f"{roi:.2f}%"
             }
         except:
             return None
@@ -88,15 +91,16 @@ class HyperliquidTracker:
     def update(self):
         # 1. 获取数据
         fills = self.get_api_data()
-        existing_ts, old_rows = self.parse_history()
+        existing_rows, old_rows = self.parse_history()
         
         # 2. 处理新成交
         new_records = []
         for f in fills:
             data = self.process_fill(f)
-            if data and data['dt'] not in existing_ts:
-                row = f"| {data['dt']} | {data['coin']} | {data['dir']} | {data['open']} | {data['close']} | {data['roi']:.2f}% |"
-                new_records.append(row)
+            if data:
+                row = f"| {data['dt']} | {data['coin']} | {data['dir']} | {data['open']} | {data['close']} | {data['roi_str']} |"
+                if row not in existing_rows and row not in new_records:
+                    new_records.append(row)
         
         # 新记录在顶部
         all_rows = new_records + old_rows
