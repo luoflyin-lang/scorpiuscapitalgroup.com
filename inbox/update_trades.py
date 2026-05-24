@@ -38,17 +38,34 @@ class HyperliquidTracker:
 
     def process_fill(self, fill):
         """处理单笔成交，使用固定 10 倍乘数计算 ROI"""
-        direction = fill['dir']
-        if "Close" not in direction:
+        direction = fill.get('dir', '')
+        
+        is_long = False
+        is_close = False
+        if direction.startswith("Close Long") or direction.startswith("Long >"):
+            is_long = True
+            is_close = True
+        elif direction.startswith("Close Short") or direction.startswith("Short >"):
+            is_long = False
+            is_close = True
+            
+        if not is_close:
             return None
 
         dt = datetime.datetime.fromtimestamp(fill['time']/1000, tz=datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
         coin = fill['coin']
         px = float(fill['px'])
-        sz = float(fill['sz'])
         pnl = float(fill.get('closedPnl', 0))
         
-        is_long = "Long" in direction
+        # 确定实际平仓的数量
+        if ">" in direction:
+            sz = abs(float(fill.get('startPosition', 0)))
+        else:
+            sz = float(fill['sz'])
+            
+        if sz == 0:
+            return None
+        
         try:
             # 反推开仓价 (此价格用于展示)
             open_px_val = px - (pnl / sz) if is_long else px + (pnl / sz)
@@ -83,6 +100,8 @@ class HyperliquidTracker:
         
         # 新记录在顶部
         all_rows = new_records + old_rows
+        # 按时间倒序排序以修复可能乱序的问题
+        all_rows.sort(key=lambda x: x.split("|")[1].strip(), reverse=True)
         if not all_rows:
             print("无可展示的数据")
             return
