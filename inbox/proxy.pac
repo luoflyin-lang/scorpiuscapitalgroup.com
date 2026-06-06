@@ -9,5 +9,5 @@ function FindProxyForURL(url, host) {
         return "DIRECT";
     }
     // 默认将流量转发给手机节点
-    return "PROXY 192.168.10.99:10809; DIRECT";
+    return "PROXY 192.168.10.99:10808; DIRECT";
 }
