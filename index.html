@@ -8,99 +8,446 @@
     <link rel="shortcut icon" href="docs/inbox/cover.jpeg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');    
-        body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        :root {
+            --bg: #f5f3ee;
+            --ink: #211f1a;
+            --gold: #9a7d3f;
+        }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+        @keyframes riseIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .rise { animation: riseIn 1.1s cubic-bezier(.16,1,.3,1) both; }
+        .rise-delay-1 { animation-delay: .15s; }
+        #chart-canvas { cursor: crosshair; }
+        #aum-ticker {
+            font-variant-numeric: tabular-nums slashed-zero;
+            font-feature-settings: 'tnum' 1, 'zero' 1;
+        }
+        /* 中心径向光晕 */
+        .hero-glow {
+            background: radial-gradient(ellipse 60% 42% at 50% 50%, rgba(154,125,63,0.10), rgba(245,243,238,0) 70%);
+        }
+        /* 极淡胶片颗粒 */
+        .grain {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.035;
+            mix-blend-mode: multiply;
+        }
+        /* 悬停提示淡入淡出 */
+        #chart-tooltip { transition: opacity .22s ease; }
     </style>
 </head>
-<body class="bg-gray-900 m-0 p-0 font-sans">
-<div class="relative w-full h-screen overflow-hidden text-white">
+<body class="bg-[#f5f3ee] m-0 p-0 font-sans overflow-hidden">
+<div class="relative w-full h-screen text-gray-800">
 
-    <div class="absolute inset-0 z-10 bg-gradient-to-b from-black/50 via-black/10 to-black/80"></div>
+    <!-- Line chart background -->
+    <div class="absolute inset-0 z-0 bg-[#f5f3ee]" id="chart-background">
+        <canvas id="chart-canvas"></canvas>
+    </div>
 
-    <header class="absolute top-0 w-full z-50 flex items-center justify-between px-4 py-4 md:px-10 md:py-8">
-        <div class="flex items-center gap-4">
-            <img src="docs/inbox/cover.jpeg" alt="Logo" class="w-10 h-10 rounded shadow-sm object-cover">
-            <div class="text-xl font-bold tracking-tight whitespace-nowrap">
+    <!-- 颗粒质感 -->
+    <div class="absolute inset-0 z-[5] pointer-events-none grain"></div>
+
+    <!-- Hover tooltip -->
+    <div id="chart-tooltip"
+         class="absolute z-40 opacity-0 pointer-events-none px-3.5 py-2 rounded-lg bg-white/80 backdrop-blur-md border border-[#9a7d3f]/20 shadow-[0_8px_30px_rgba(0,0,0,0.08)] text-gray-800"
+         style="transform: translate(-50%, -130%); white-space: nowrap;">
+        <div class="text-[10px] tracking-[0.18em] uppercase text-gray-400 mb-1" id="tt-date"></div>
+        <div class="text-sm font-semibold tabular-nums text-[#8a6d3b]" id="tt-value"></div>
+    </div>
+
+    <div class="absolute inset-0 z-10 bg-gradient-to-b from-[#f5f3ee]/60 via-transparent to-[#f5f3ee]/60 pointer-events-none"></div>
+    <div class="absolute inset-0 z-[12] pointer-events-none hero-glow"></div>
+
+    <header class="absolute top-0 w-full z-50 flex items-center justify-between px-6 py-5 md:px-12 md:py-8 rise">
+        <div class="flex items-center gap-3.5">
+            <img src="docs/inbox/cover.jpeg" alt="Logo" class="w-9 h-9 md:w-10 md:h-10 rounded-md object-cover ring-1 ring-[#9a7d3f]/25 shadow-sm">
+            <div class="text-lg md:text-xl font-semibold tracking-[0.04em] whitespace-nowrap text-gray-800">
                 美国天蝎座资本集团
             </div>
         </div>
-
-
+        <a href="docs/index.html" class="px-4 py-2 text-xs md:text-sm font-medium tracking-[0.12em] uppercase text-[#8a6d3b] bg-white/60 hover:bg-white hover:shadow-sm rounded-md transition-all duration-300 border border-[#9a7d3f]/25">
+            Docs
+        </a>
     </header>
 
-    <div class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none text-white">
-        <div class="font-bold tracking-tighter flex items-baseline" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+    <div class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none text-gray-900">
+        <div class="font-semibold tracking-[-0.03em] flex items-baseline rise rise-delay-1" style="font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;">
             <span class="text-5xl md:text-8xl lg:text-9xl tabular-nums" id="aum-ticker">0</span>
-            <span class="text-lg md:text-4xl lg:text-5xl ml-1 md:ml-3 tracking-normal">XTS</span>
+            <span class="text-xs md:text-base lg:text-lg ml-2 md:ml-4 tracking-[0.05em] uppercase text-[#9a7d3f] font-light whitespace-nowrap" id="rate-ticker">0/s</span>
         </div>
     </div>
 
-    <footer class="absolute bottom-0 w-full h-10 z-50 flex items-center px-4 md:px-10 border-t border-white/20 text-gray-400 text-[10px] md:text-xs tracking-wider font-light">
+    <footer class="absolute bottom-0 w-full h-10 z-50 flex items-center px-6 md:px-12 border-t border-black/[0.06] text-gray-400 text-[10px] md:text-xs tracking-[0.14em] font-light uppercase">
         &copy; 2026 Scorpius Capital Group LLC. All rights reserved.
     </footer>
 </div>
 <script>
-async function initTicker() {
-    try {
-        const response = await fetch('aum.csv');
-        const text = await response.text();
-        
-        const lines = text.trim().split('\n').slice(1);
-        const data = lines.map(line => {
-            const [yearStr, valueStr] = line.split(',');
-            const year = parseInt(yearStr.trim());
-            const value = parseFloat(valueStr.trim());
-            // Target is end of the year (Dec 31, 23:59:59.999)
-            const timestamp = new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999)).getTime();
-            return { year, value, timestamp };
-        }).sort((a, b) => a.timestamp - b.timestamp);
+// ==========================================
+// 1. 共用数据表 (DATE,VALUE)  YYYYMMDD,数值
+//   折线图读取到"倒数第二个"点；最后一点用于滚动数字实时预测。
+// ==========================================
+const AUM_CSV_TEXT = `Date,Value
+20260101,1000
+20260201,1185
+20260301,1290
+20260401,1560
+20260501,1830
+20260601,2010
+20260701,2380
+20260801,2640
+20260901,3010
+20261001,3450
+20261101,3720
+20261201,4180
+20270101,4520
+20270201,5050
+20270301,5460
+20270402,6000`;
 
-        if (data.length === 0) return;
+function parseData() {
+    const lines = AUM_CSV_TEXT.trim().split('\n').slice(1);
+    return lines.map(line => {
+        const [dateStr, valueStr] = line.split(',');
+        const d = dateStr.trim();
+        const year = parseInt(d.slice(0, 4), 10);
+        const month = parseInt(d.slice(4, 6), 10) - 1;
+        const day = parseInt(d.slice(6, 8), 10);
+        const value = parseFloat(valueStr.trim());
+        const timestamp = new Date(year, month, day).getTime();
+        return { dateStr: d, year, month, day, value, timestamp };
+    }).filter(d => !isNaN(d.timestamp)).sort((a, b) => a.timestamp - b.timestamp);
+}
 
-        const tickerEl = document.getElementById('aum-ticker');
+const FULL_DATA = parseData();
+const CHART_DATA = FULL_DATA.slice(0, -1).length ? FULL_DATA.slice(0, -1) : FULL_DATA.slice();
 
-        function updateTicker() {
-            const now = Date.now();
-            let currentValue = 0;
+function fmtDate(d) {
+    const p = n => String(n).padStart(2, '0');
+    return `${d.year}-${p(d.month + 1)}-${p(d.day)}`;
+}
+function fmtNumber(v) {
+    return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+function fmtRate(v) {
+    if (!isFinite(v) || v === 0) return "0/s";
+    const abs = Math.abs(v);
+    let decimals = 2;
+    if (abs < 1) decimals = Math.ceil(-Math.log10(abs)) + 1;
+    decimals = Math.max(2, Math.min(decimals, 12));
+    return v.toFixed(decimals) + "/s";
+}
+const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
 
-            if (now <= data[0].timestamp) {
-                const startOfYear = new Date(Date.UTC(data[0].year, 0, 1, 0, 0, 0, 0)).getTime();
-                if (now < startOfYear) {
-                    currentValue = 0;
-                } else {
-                    const ratio = (now - startOfYear) / (data[0].timestamp - startOfYear);
-                    currentValue = ratio * data[0].value;
-                }
-            } else if (now >= data[data.length - 1].timestamp) {
-                currentValue = data[data.length - 1].value;
-            } else {
-                for (let i = 0; i < data.length - 1; i++) {
-                    if (now >= data[i].timestamp && now < data[i+1].timestamp) {
-                        const start = data[i].timestamp;
-                        const end = data[i+1].timestamp;
-                        const ratio = (now - start) / (end - start);
-                        currentValue = data[i].value + ratio * (data[i+1].value - data[i].value);
-                        break;
-                    }
-                }
+// ==========================================
+// 2. 折线图引擎（平滑曲线 + 入场动画 + 呼吸点 + 悬停）
+// ==========================================
+function initLineChart(data) {
+    const canvas = document.getElementById('chart-canvas');
+    const ctx = canvas.getContext('2d');
+    const tooltip = document.getElementById('chart-tooltip');
+    const ttDate = document.getElementById('tt-date');
+    const ttValue = document.getElementById('tt-value');
+
+    let margin = { left: 110, right: 110, top: 130, bottom: 96 };
+    let width, height, dpr;
+    let points = [];
+    let yMin = 0, yMax = 1;
+    let hoverIndex = -1;
+    let startTime = null;
+    const REVEAL_MS = 1700;
+
+    const COLOR_LINE = '#23211c';
+    const COLOR_ACCENT = '#9a7d3f';
+
+    function resize() {
+        dpr = window.devicePixelRatio || 1;
+        width = window.innerWidth;
+        height = window.innerHeight;
+        const mobile = width < 640;
+        margin = {
+            left: mobile ? 26 : 110,
+            right: mobile ? 26 : 110,
+            top: mobile ? 96 : 130,
+            bottom: mobile ? 74 : 96
+        };
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        computePoints();
+    }
+
+    function computePoints() {
+        const chartW = width - margin.left - margin.right;
+        const chartH = height - margin.top - margin.bottom;
+        const values = data.map(d => d.value);
+        let vMin = Math.min(...values);
+        let vMax = Math.max(...values);
+        if (vMin === vMax) { vMin = vMin * 0.9; vMax = vMax * 1.1 || 1; }
+        const pad = (vMax - vMin) * 0.12;
+        yMin = Math.max(0, vMin - pad);
+        yMax = vMax + pad;
+        points = data.map((d, i) => {
+            const x = data.length === 1
+                ? margin.left + chartW / 2
+                : margin.left + (i / (data.length - 1)) * chartW;
+            const y = margin.top + chartH - (d.value - yMin) / (yMax - yMin) * chartH;
+            return { x, y, data: d };
+        });
+    }
+
+    function smoothCurveTo(pts) {
+        for (let i = 0; i < pts.length - 1; i++) {
+            const p0 = pts[i === 0 ? 0 : i - 1];
+            const p1 = pts[i];
+            const p2 = pts[i + 1];
+            const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+            const cp1x = p1.x + (p2.x - p0.x) / 6;
+            const cp1y = p1.y + (p2.y - p0.y) / 6;
+            const cp2x = p2.x - (p3.x - p1.x) / 6;
+            const cp2y = p2.y - (p3.y - p1.y) / 6;
+            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+        }
+    }
+    function setLabelSpacing(px) { try { ctx.letterSpacing = px; } catch (e) {} }
+    const isMobile = () => width < 640;
+
+    function draw(elapsed) {
+        const progress = easeOutCubic(Math.min(elapsed / REVEAL_MS, 1));
+        ctx.clearRect(0, 0, width, height);
+        const chartH = height - margin.top - margin.bottom;
+        const baseY = height - margin.bottom;
+        const gridSteps = 5;
+
+        // 网格 + 右侧 Y 轴数值（窄屏隐藏数值）
+        ctx.font = '11px Inter, sans-serif';
+        ctx.textAlign = 'left';
+        setLabelSpacing('0.5px');
+        for (let i = 0; i <= gridSteps; i++) {
+            const y = margin.top + i * (chartH / gridSteps);
+            ctx.strokeStyle = 'rgba(0,0,0,0.035)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(margin.left, y);
+            ctx.lineTo(width - margin.right, y);
+            ctx.stroke();
+            if (!isMobile()) {
+                const val = yMax - i * (yMax - yMin) / gridSteps;
+                ctx.fillStyle = 'rgba(138,109,59,0.55)';
+                ctx.fillText(fmtNumber(val), width - margin.right + 16, y + 4);
             }
+        }
+        setLabelSpacing('0px');
 
-            const formatted = Math.floor(currentValue)
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, "<span style='display:inline-block; width:0.12em;'></span>");
+        // 极简底部基线
+        ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(margin.left, baseY);
+        ctx.lineTo(width - margin.right, baseY);
+        ctx.stroke();
 
-            tickerEl.innerHTML = formatted;
-            
-            requestAnimationFrame(updateTicker);
+        if (points.length === 0) return;
+
+        // —— 入场动画：自左向右揭示折线/填充/标签 ——
+        const revealX = margin.left + (width - margin.left - margin.right) * progress;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, revealX, height);
+        ctx.clip();
+
+        // 渐变填充
+        const grad = ctx.createLinearGradient(0, margin.top, 0, baseY);
+        grad.addColorStop(0, 'rgba(154,125,63,0.13)');
+        grad.addColorStop(1, 'rgba(154,125,63,0.00)');
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, baseY);
+        ctx.lineTo(points[0].x, points[0].y);
+        smoothCurveTo(points);
+        ctx.lineTo(points[points.length - 1].x, baseY);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // 平滑折线
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        smoothCurveTo(points);
+        ctx.strokeStyle = COLOR_LINE;
+        ctx.lineWidth = 1.6;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // X 轴日期标签（自动抽稀）
+        const labelStep = Math.max(1, Math.ceil(points.length / (isMobile() ? 4 : 7)));
+        ctx.textAlign = 'center';
+        ctx.font = '10.5px Inter, sans-serif';
+        setLabelSpacing('0.6px');
+        points.forEach((p, i) => {
+            if (i % labelStep !== 0 && i !== points.length - 1) return;
+            ctx.fillStyle = 'rgba(0,0,0,0.38)';
+            ctx.fillText(fmtDate(p.data), p.x, baseY + 22);
+        });
+        setLabelSpacing('0px');
+        ctx.restore();
+
+        // —— 最新点：呼吸光晕（入场完成后）——
+        if (progress >= 1) {
+            const last = points[points.length - 1];
+            const breathe = (Math.sin(elapsed / 950) + 1) / 2; // 0..1
+            const haloR = 7 + breathe * 3.5;
+            ctx.beginPath();
+            ctx.arc(last.x, last.y, haloR, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(154,125,63,${0.10 + breathe * 0.10})`;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(last.x, last.y, 3.2, 0, Math.PI * 2);
+            ctx.fillStyle = COLOR_ACCENT;
+            ctx.fill();
         }
 
-        requestAnimationFrame(updateTicker);
-
-    } catch (e) {
-        console.error("Failed to load AUM data:", e);
+        // 悬停准线 + 实心点
+        if (hoverIndex >= 0 && hoverIndex < points.length && progress >= 1) {
+            const p = points[hoverIndex];
+            ctx.setLineDash([3, 5]);
+            ctx.strokeStyle = 'rgba(154,125,63,0.4)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(p.x, margin.top);
+            ctx.lineTo(p.x, baseY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(154,125,63,0.18)';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = COLOR_ACCENT;
+            ctx.fill();
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#f5f3ee';
+            ctx.stroke();
+        }
     }
+
+    function nearestIndex(mx) {
+        let best = -1, bestDist = Infinity;
+        points.forEach((p, i) => {
+            const d = Math.abs(p.x - mx);
+            if (d < bestDist) { bestDist = d; best = i; }
+        });
+        return bestDist <= 40 ? best : -1;
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const idx = nearestIndex(mx);
+        hoverIndex = idx;
+        if (idx >= 0) {
+            const p = points[idx];
+            ttDate.textContent = fmtDate(p.data);
+            ttValue.textContent = fmtNumber(p.data.value);
+            tooltip.style.left = p.x + 'px';
+            tooltip.style.top = p.y + 'px';
+            tooltip.classList.remove('opacity-0');
+        } else {
+            tooltip.classList.add('opacity-0');
+        }
+    });
+    canvas.addEventListener('mouseleave', () => {
+        hoverIndex = -1;
+        tooltip.classList.add('opacity-0');
+    });
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    function frame(ts) {
+        if (startTime === null) startTime = ts;
+        draw(ts - startTime);
+        requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
 }
-initTicker();
+
+// ==========================================
+// 3. 中间滚动数字引擎（含最新预测点的完整数据）
+// ==========================================
+function initTicker(data) {
+    if (data.length === 0) return;
+    const tickerEl = document.getElementById('aum-ticker');
+    const rateEl = document.getElementById('rate-ticker');
+    let lastFormatted = "";
+    let lastRateFormatted = "";
+
+    function updateTicker() {
+        const now = Date.now();
+        let currentValue = 0;
+        let valuePerSecond = 0;
+
+        if (now <= data[0].timestamp) {
+            const startOfYear = new Date(data[0].year, 0, 1).getTime();
+            if (now < startOfYear) {
+                currentValue = 0; valuePerSecond = 0;
+            } else {
+                const ratio = (now - startOfYear) / (data[0].timestamp - startOfYear);
+                currentValue = ratio * data[0].value;
+                valuePerSecond = data[0].value / ((data[0].timestamp - startOfYear) / 1000);
+            }
+        } else if (now >= data[data.length - 1].timestamp) {
+            currentValue = data[data.length - 1].value;
+            valuePerSecond = 0;
+        } else {
+            for (let i = 0; i < data.length - 1; i++) {
+                if (now >= data[i].timestamp && now < data[i + 1].timestamp) {
+                    const start = data[i].timestamp;
+                    const end = data[i + 1].timestamp;
+                    const ratio = (now - start) / (end - start);
+                    currentValue = data[i].value + ratio * (data[i + 1].value - data[i].value);
+                    valuePerSecond = (data[i + 1].value - data[i].value) / ((end - start) / 1000);
+                    break;
+                }
+            }
+        }
+
+        const integerLength = Math.floor(currentValue).toString().length;
+        let decimalPlaces;
+        if (integerLength >= 9) decimalPlaces = 0;
+        else if (integerLength === 1) decimalPlaces = 9;
+        else decimalPlaces = 9 - integerLength;
+
+        const fixedString = currentValue.toFixed(decimalPlaces);
+        const [integerPart, decimalPart] = fixedString.split('.');
+        const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, "<span style='display:inline-block; width:0.12em;'></span>");
+        const formatted = decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+        const formattedRate = fmtRate(valuePerSecond);
+
+        if (formatted !== lastFormatted) { tickerEl.innerHTML = formatted; lastFormatted = formatted; }
+        if (formattedRate !== lastRateFormatted) { rateEl.textContent = formattedRate; lastRateFormatted = formattedRate; }
+
+        requestAnimationFrame(updateTicker);
+    }
+    requestAnimationFrame(updateTicker);
+}
+
+// ==========================================
+// 4. 启动
+// ==========================================
+initLineChart(CHART_DATA);
+initTicker(FULL_DATA);
 </script>
 </body>
 </html>
