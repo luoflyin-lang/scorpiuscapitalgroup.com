@@ -141,7 +141,7 @@ function initLineChart(data) {
     const ttDate = document.getElementById('tt-date');
     const ttValue = document.getElementById('tt-value');
 
-    let margin = { left: 110, right: 110, top: 130, bottom: 96 };
+    let margin = { left: 48, right: 48, top: 130, bottom: 96 };
     let width, height, dpr;
     let points = [];
     let yMin = 0, yMax = 1;
@@ -158,8 +158,8 @@ function initLineChart(data) {
         height = window.innerHeight;
         const mobile = width < 640;
         margin = {
-            left: mobile ? 26 : 110,
-            right: mobile ? 26 : 110,
+            left: mobile ? 24 : 48,
+            right: mobile ? 24 : 48,
             top: mobile ? 96 : 130,
             bottom: mobile ? 74 : 96
         };
@@ -215,7 +215,7 @@ function initLineChart(data) {
 
         // 网格 + 右侧 Y 轴数值（窄屏隐藏数值）
         ctx.font = '11px Inter, sans-serif';
-        ctx.textAlign = 'left';
+        ctx.textAlign = 'right';
         setLabelSpacing('0.5px');
         for (let i = 0; i <= gridSteps; i++) {
             const y = margin.top + i * (chartH / gridSteps);
@@ -228,7 +228,7 @@ function initLineChart(data) {
             if (!isMobile()) {
                 const val = yMax - i * (yMax - yMin) / gridSteps;
                 ctx.fillStyle = 'rgba(138,109,59,0.55)';
-                ctx.fillText(fmtNumber(val), width - margin.right + 16, y + 4);
+                ctx.fillText(fmtNumber(val), width - margin.right - 8, y - 6);
             }
         }
         setLabelSpacing('0px');
