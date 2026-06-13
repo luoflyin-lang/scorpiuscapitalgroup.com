@@ -226,11 +226,10 @@ function initLineChart(data) {
             ctx.stroke();
             if (!isMobile()) {
                 const val = yMax - i * (yMax - yMin) / gridSteps;
+                const initialValue = data[0] ? data[0].value : 1;
+                const yieldRate = initialValue !== 0 ? ((val - initialValue) / initialValue) * 100 : 0;
                 ctx.fillStyle = 'rgba(138,109,59,0.55)';
-                if (i === 0) {
-                    ctx.fillText('收益率', width - margin.right - 8, y - 20);
-                }
-                ctx.fillText(fmtNumber(val) + '%', width - margin.right - 8, y - 6);
+                ctx.fillText(fmtNumber(yieldRate) + '%', width - margin.right - 8, y - 6);
             }
         }
         setLabelSpacing('0px');
