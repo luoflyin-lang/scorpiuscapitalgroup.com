@@ -227,7 +227,10 @@ function initLineChart(data) {
             if (!isMobile()) {
                 const val = yMax - i * (yMax - yMin) / gridSteps;
                 ctx.fillStyle = 'rgba(138,109,59,0.55)';
-                ctx.fillText(fmtNumber(val), width - margin.right - 8, y - 6);
+                if (i === 0) {
+                    ctx.fillText('收益率', width - margin.right - 8, y - 20);
+                }
+                ctx.fillText(fmtNumber(val) + '%', width - margin.right - 8, y - 6);
             }
         }
         setLabelSpacing('0px');
@@ -342,7 +345,7 @@ function initLineChart(data) {
         if (idx >= 0) {
             const p = points[idx];
             ttDate.textContent = fmtDate(p.data);
-            ttValue.textContent = fmtNumber(p.data.value);
+            ttValue.textContent = fmtNumber(p.data.value) + '%';
             tooltip.style.left = p.x + 'px';
             tooltip.style.top = p.y + 'px';
             tooltip.classList.remove('opacity-0');
