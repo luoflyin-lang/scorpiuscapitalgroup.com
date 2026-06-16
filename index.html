@@ -4,122 +4,286 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scorpius Capital Group</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <meta name="description" content="Scorpius Capital Group LLC — disciplined capital, compounding conviction.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Scorpius Capital Group LLC">
+    <meta property="og:description" content="Disciplined capital. Compounding conviction.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Scorpius Capital Group LLC">
+    <meta name="twitter:description" content="Disciplined capital. Compounding conviction.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23211f1a'/%3E%3Ctext%20x='16'%20y='23'%20font-family='Roboto,sans-serif'%20font-size='19'%20fill='%239a7d3f'%20text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+
     <style>
+        /* ===== 字体（全局 Roboto） ===== */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
         :root {
             --bg: #f5f3ee;
             --ink: #211f1a;
             --gold: #9a7d3f;
+            --gold-light: #c4a866;
+            --gold-text: #6f5826;   /* 加深后的金色，满足 WCAG AA */
+            --deep: #2c3a30;        /* 墨绿 */
+            --deep-light: #3e5343;
         }
+
+        * { box-sizing: border-box; }
         html, body { height: 100%; }
         body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: #2b2b2b;
             font-family: 'Roboto', sans-serif;
+            overflow: hidden;
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizeLegibility;
         }
+
+        /* 保留类名，统一指向 Roboto */
+        .font-display { font-family: 'Roboto', sans-serif; }
+        .font-mono {
+            font-family: 'Roboto', sans-serif;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: 'tnum' 1;
+        }
+
+        /* ===== 布局骨架 ===== */
+        .stage { position: relative; width: 100%; height: 100vh; }
+        .layer { position: absolute; inset: 0; }
+        .z0  { z-index: 0; }
+        .z5  { z-index: 5; }
+        .z10 { z-index: 10; }
+        .z12 { z-index: 12; }
+        .z20 { z-index: 20; }
+        .z40 { z-index: 40; }
+        .z50 { z-index: 50; }
+
+        /* ===== 动画 ===== */
         @keyframes riseIn {
             from { opacity: 0; transform: translateY(12px); filter: blur(2px); }
             to   { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
-        @keyframes fadeScale {
-            from { opacity: 0; transform: scale(0.96); }
-            to   { opacity: 1; transform: scale(1); }
-        }
         .rise { animation: riseIn 1.2s cubic-bezier(.16,1,.3,1) both; }
         .rise-delay-1 { animation-delay: .3s; }
-        .rise-delay-2 { animation-delay: .6s; }
-        .fade-scale { animation: fadeScale 1.5s cubic-bezier(.16,1,.3,1) both; animation-delay: .8s; }
-        
-        #chart-canvas { cursor: crosshair; }
-        #aum-ticker {
-            font-variant-numeric: tabular-nums slashed-zero;
-            font-feature-settings: 'tnum' 1, 'zero' 1;
-            background: linear-gradient(135deg, #211f1a 0%, #4a4539 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0px 4px 12px rgba(0,0,0,0.03);
+
+        /* ===== 顶部金属金细线 ===== */
+        .top-hairline {
+            position: absolute; top: 0; left: 0; width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%);
+            opacity: 0.5;
         }
-        /* 中心径向光晕 - 修改为跟随鼠标和呼吸 */
-        .hero-glow {
+
+        /* ===== 背景图层 ===== */
+        #chart-canvas { cursor: crosshair; display: block; }
+
+        .grain {
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.055;
+            mix-blend-mode: multiply;
+        }
+
+        .vignette {
+            pointer-events: none;
+            background: linear-gradient(to bottom, rgba(245,243,238,0.6) 0%, transparent 50%, rgba(245,243,238,0.6) 100%);
+        }
+
+        /* ===== 中心呼吸光晕（跟随鼠标） ===== */
+        .hero-glow-container {
+            position: absolute; left: 50%; top: 50%;
+            width: 120vw; height: 120vh;
+            transform: translate(-50%, -50%);
+            animation: pulseGlow 6s ease-in-out infinite;
+            pointer-events: none; z-index: 12;
+        }
+        #hero-glow-el {
+            position: absolute; inset: 0;
             background: radial-gradient(circle at center, rgba(154,125,63,0.12) 0%, rgba(245,243,238,0) 60%);
-            transition: transform 0.1s ease-out;
+            transition: transform 0.12s ease-out;
             will-change: transform;
         }
         @keyframes pulseGlow {
-            0% { opacity: 0.8; transform: scale(1) translate(-50%, -50%); }
-            50% { opacity: 1; transform: scale(1.05) translate(-50%, -50%); }
-            100% { opacity: 0.8; transform: scale(1) translate(-50%, -50%); }
+            0%   { opacity: .8; transform: translate(-50%, -50%) scale(1); }
+            50%  { opacity: 1;  transform: translate(-50%, -50%) scale(1.05); }
+            100% { opacity: .8; transform: translate(-50%, -50%) scale(1); }
         }
-        .hero-glow-container {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: 120vw;
-            height: 120vh;
-            transform: translate(-50%, -50%);
-            animation: pulseGlow 6s ease-in-out infinite;
+
+        /* ===== Header ===== */
+        header {
+            position: absolute; top: 0; left: 0; width: 100%;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 24px;
+            background: linear-gradient(to bottom, rgba(245,243,238,0.9) 0%, rgba(245,243,238,0) 100%);
+        }
+        .brand {
+            font-size: 18px; font-weight: 600;
+            letter-spacing: 0.02em; white-space: nowrap;
+            color: #1a1a1a;
+        }
+
+        /* Docs 链接：扁平文字 + 金色下划线滑入，去掉边框盒子 */
+        .docs-link {
+            position: relative;
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 4px 2px;
+            font-size: 12px; font-weight: 500;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            text-decoration: none;
+            color: var(--deep);
+            transition: color .3s ease;
+        }
+        .docs-link::after {
+            content: "";
+            position: absolute; left: 0; bottom: 0;
+            width: 100%; height: 1px;
+            background: var(--gold);
+            transform: scaleX(0); transform-origin: left;
+            transition: transform .35s cubic-bezier(.16,1,.3,1);
+        }
+        .docs-link:hover { color: var(--gold-text); }
+        .docs-link:hover::after { transform: scaleX(1); }
+        .docs-arrow { width: 13px; height: 13px; transition: transform .3s cubic-bezier(.16,1,.3,1); }
+        .docs-link:hover .docs-arrow { transform: translateX(3px); }
+
+        /* ===== 中心数字 ===== */
+        .hero-center {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 0 16px;
             pointer-events: none;
-            z-index: 12;
         }
-        /* 极淡胶片颗粒 */
-        .grain {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            opacity: 0.035;
-            mix-blend-mode: multiply;
+        .ticker-row {
+            display: flex; align-items: baseline; justify-content: center;
+            flex-wrap: wrap;
+            font-weight: 600; letter-spacing: -0.02em;
         }
-        /* 悬停提示淡入淡出 */
-        #chart-tooltip { transition: opacity .22s ease; }
+        #aum-ticker {
+            font-size: clamp(2.75rem, 13vw, 9rem);
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: 'tnum' 1;
+            background: linear-gradient(135deg, #211f1a 0%, #4a4539 100%);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        #rate-ticker {
+            margin-left: 14px;
+            font-size: clamp(0.7rem, 1.6vw, 1.1rem);
+            font-weight: 500;
+            letter-spacing: 0.05em; text-transform: uppercase;
+            white-space: nowrap;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ===== Tooltip：墨绿描边 + 墨绿数值 ===== */
+        #chart-tooltip {
+            position: absolute; z-index: 40;
+            opacity: 0; pointer-events: none;
+            padding: 8px 14px; border-radius: 8px;
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(44,58,48,0.22);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transform: translate(-50%, -130%);
+            white-space: nowrap;
+            transition: opacity .22s ease;
+        }
+        #tt-date {
+            font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+            color: #8c8c8c; margin-bottom: 4px;
+        }
+        #tt-value {
+            font-size: 14px; font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: var(--deep);
+        }
+
+        /* ===== 页脚：墨绿顶线 + 双色 ===== */
+        footer {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            height: 40px;
+            display: flex; align-items: center;
+            padding: 0 24px;
+            border-top: 1px solid rgba(44,58,48,0.2);
+            color: var(--deep-light);
+            font-size: 10px; font-weight: 400;
+            letter-spacing: 0.14em; text-transform: uppercase;
+        }
+        footer .accent { color: var(--gold-text); }
+
+        /* ===== 响应式 ===== */
+        @media (min-width: 768px) {
+            header { padding: 32px 48px; }
+            .brand { font-size: 24px; }
+            .docs-link { font-size: 14px; }
+            footer { padding: 0 48px; font-size: 12px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .rise, .hero-glow-container { animation: none; }
+            .docs-link::after, .docs-arrow { transition: none; }
+        }
     </style>
 </head>
-<body class="bg-[#f5f3ee] m-0 p-0 font-sans overflow-hidden">
-<div class="relative w-full h-screen text-gray-800">
+<body>
+<div class="stage">
 
-    <!-- Line chart background -->
-    <div class="absolute inset-0 z-0 bg-[#f5f3ee]" id="chart-background">
-        <canvas id="chart-canvas"></canvas>
+    <div class="top-hairline z50"></div>
+
+    <!-- 折线图背景 -->
+    <div class="layer z0">
+        <canvas id="chart-canvas" role="img"
+                aria-label="Scorpius Capital Group performance trend line chart"></canvas>
     </div>
 
     <!-- 颗粒质感 -->
-    <div class="absolute inset-0 z-[5] pointer-events-none grain"></div>
+    <div class="layer z5 grain"></div>
 
     <!-- Hover tooltip -->
-    <div id="chart-tooltip"
-         class="absolute z-40 opacity-0 pointer-events-none px-3.5 py-2 rounded-lg bg-white/80 backdrop-blur-md border border-[#9a7d3f]/20 shadow-[0_8px_30px_rgba(0,0,0,0.08)] text-gray-800"
-         style="transform: translate(-50%, -130%); white-space: nowrap;">
-        <div class="text-[10px] tracking-[0.18em] uppercase text-gray-400 mb-1" id="tt-date"></div>
-        <div class="text-sm font-semibold tabular-nums text-[#8a6d3b]" id="tt-value"></div>
+    <div id="chart-tooltip">
+        <div id="tt-date"></div>
+        <div id="tt-value"></div>
     </div>
 
-    <div class="absolute inset-0 z-10 bg-gradient-to-b from-[#f5f3ee]/60 via-transparent to-[#f5f3ee]/60 pointer-events-none"></div>
-    <div class="absolute inset-0 z-[12] pointer-events-none hero-glow"></div>
+    <!-- 上下渐隐 -->
+    <div class="layer z10 vignette"></div>
 
-    <header class="absolute top-0 w-full z-50 flex items-center justify-between px-6 py-5 md:px-12 md:py-8 rise">
-        <div class="flex items-center gap-3.5">
-            <div class="text-lg md:text-xl font-semibold tracking-[0.04em] whitespace-nowrap text-gray-800">
-                Scorpius Capital Group LLC
-            </div>
-        </div>
-        <a href="docs/index.html" class="px-4 py-2 text-xs md:text-sm font-medium tracking-[0.12em] uppercase text-[#8a6d3b] bg-white/60 hover:bg-white hover:shadow-sm rounded-md transition-all duration-300 border border-[#9a7d3f]/25">
+    <!-- 呼吸 + 跟随鼠标光晕 -->
+    <div class="hero-glow-container"><div id="hero-glow-el"></div></div>
+
+    <!-- Header -->
+    <header class="z50 rise">
+        <div class="brand font-display">Scorpius Capital Group LLC</div>
+        <a href="docs/index.html" class="docs-link" aria-label="Open documentation">
             Docs
+            <svg class="docs-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
         </a>
     </header>
 
-    <div class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none text-gray-900">
-        <div class="font-semibold tracking-[-0.03em] flex items-baseline rise rise-delay-1" style="font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-            <span class="text-5xl md:text-8xl lg:text-9xl tabular-nums" id="aum-ticker">0</span>
-            <span class="text-xs md:text-base lg:text-lg ml-2 md:ml-4 tracking-[0.05em] uppercase text-[#9a7d3f] font-light whitespace-nowrap" id="rate-ticker">0/s</span>
+    <!-- 中心数字（副标题已移除） -->
+    <div class="hero-center z20">
+        <div class="ticker-row">
+            <span class="font-mono" id="aum-ticker" aria-live="polite" aria-atomic="true">0</span>
+            <span class="font-mono" id="rate-ticker">0/s</span>
         </div>
     </div>
 
-    <footer class="absolute bottom-0 w-full h-10 z-50 flex items-center px-6 md:px-12 border-t border-black/[0.06] text-gray-400 text-[10px] md:text-xs tracking-[0.14em] font-light uppercase">
-        &copy; 2026 Scorpius Capital Group LLC. All rights reserved.
+    <!-- 页脚 -->
+    <footer class="z50">
+        <span>&copy; 2026 <span class="accent">Scorpius Capital Group LLC</span>. All rights reserved.</span>
     </footer>
 </div>
+
 <script>
 // ==========================================
-// 1. 共用数据表 (DATE,VALUE)  YYYYMMDD,数值
-//   折线图读取到"倒数第二个"点；最后一点用于滚动数字实时预测。
+// 1. 数据
 // ==========================================
 const AUM_CSV_TEXT = `Date,Value
 20260612,100
@@ -160,7 +324,7 @@ function fmtRate(v) {
 const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
 
 // ==========================================
-// 2. 折线图引擎（平滑曲线 + 入场动画 + 呼吸点 + 悬停）
+// 2. 折线图引擎
 // ==========================================
 function initLineChart(data) {
     const canvas = document.getElementById('chart-canvas');
@@ -169,7 +333,7 @@ function initLineChart(data) {
     const ttDate = document.getElementById('tt-date');
     const ttValue = document.getElementById('tt-value');
 
-    let margin = { left: 48, right: 48, top: 130, bottom: 96 };
+    let margin = { left: 48, right: 48, top: 170, bottom: 96 };
     let width, height, dpr;
     let points = [];
     let yMin = 0, yMax = 1;
@@ -179,6 +343,7 @@ function initLineChart(data) {
 
     const COLOR_LINE = '#23211c';
     const COLOR_ACCENT = '#9a7d3f';
+    const COLOR_DEEP = '#2c3a30';
 
     function resize() {
         dpr = window.devicePixelRatio || 1;
@@ -188,7 +353,7 @@ function initLineChart(data) {
         margin = {
             left: mobile ? 24 : 48,
             right: mobile ? 24 : 48,
-            top: mobile ? 96 : 130,
+            top: mobile ? 120 : 170,
             bottom: mobile ? 74 : 96
         };
         canvas.width = Math.floor(width * dpr);
@@ -241,13 +406,12 @@ function initLineChart(data) {
         const baseY = height - margin.bottom;
         const gridSteps = 5;
 
-        // 网格 + 右侧 Y 轴数值（窄屏隐藏数值）
-        ctx.font = '11px Inter, sans-serif';
+        ctx.font = '11px "Roboto", sans-serif';
         ctx.textAlign = 'right';
         setLabelSpacing('0.5px');
         for (let i = 0; i <= gridSteps; i++) {
             const y = margin.top + i * (chartH / gridSteps);
-            ctx.strokeStyle = 'rgba(0,0,0,0.035)';
+            ctx.strokeStyle = 'rgba(44,58,48,0.06)';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(margin.left, y);
@@ -257,14 +421,14 @@ function initLineChart(data) {
                 const val = yMax - i * (yMax - yMin) / gridSteps;
                 const initialValue = data[0] ? data[0].value : 1;
                 const yieldRate = initialValue !== 0 ? ((val - initialValue) / initialValue) * 100 : 0;
-                ctx.fillStyle = 'rgba(138,109,59,0.55)';
+                // 加深后的金色，满足 AA 对比度
+                ctx.fillStyle = 'rgba(111,88,38,0.9)';
                 ctx.fillText(fmtNumber(yieldRate) + '%', width - margin.right - 8, y - 6);
             }
         }
         setLabelSpacing('0px');
 
-        // 极简底部基线
-        ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+        ctx.strokeStyle = 'rgba(44,58,48,0.16)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(margin.left, baseY);
@@ -273,14 +437,12 @@ function initLineChart(data) {
 
         if (points.length === 0) return;
 
-        // —— 入场动画：自左向右揭示折线/填充/标签 ——
         const revealX = margin.left + (width - margin.left - margin.right) * progress;
         ctx.save();
         ctx.beginPath();
         ctx.rect(0, 0, revealX, height);
         ctx.clip();
 
-        // 渐变填充
         const grad = ctx.createLinearGradient(0, margin.top, 0, baseY);
         grad.addColorStop(0, 'rgba(154,125,63,0.13)');
         grad.addColorStop(1, 'rgba(154,125,63,0.00)');
@@ -293,7 +455,6 @@ function initLineChart(data) {
         ctx.fillStyle = grad;
         ctx.fill();
 
-        // 平滑折线
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
         smoothCurveTo(points);
@@ -303,23 +464,21 @@ function initLineChart(data) {
         ctx.lineCap = 'round';
         ctx.stroke();
 
-        // X 轴日期标签（自动抽稀）
         const labelStep = Math.max(1, Math.ceil(points.length / (isMobile() ? 4 : 7)));
         ctx.textAlign = 'center';
-        ctx.font = '10.5px Inter, sans-serif';
+        ctx.font = '10.5px "Roboto", sans-serif';
         setLabelSpacing('0.6px');
         points.forEach((p, i) => {
             if (i % labelStep !== 0 && i !== points.length - 1) return;
-            ctx.fillStyle = 'rgba(0,0,0,0.38)';
+            ctx.fillStyle = 'rgba(44,58,48,0.5)';
             ctx.fillText(fmtDate(p.data), p.x, baseY + 22);
         });
         setLabelSpacing('0px');
         ctx.restore();
 
-        // —— 最新点：呼吸光晕（入场完成后）——
         if (progress >= 1) {
             const last = points[points.length - 1];
-            const breathe = (Math.sin(elapsed / 950) + 1) / 2; // 0..1
+            const breathe = (Math.sin(elapsed / 950) + 1) / 2;
             const haloR = 7 + breathe * 3.5;
             ctx.beginPath();
             ctx.arc(last.x, last.y, haloR, 0, Math.PI * 2);
@@ -331,11 +490,11 @@ function initLineChart(data) {
             ctx.fill();
         }
 
-        // 悬停准线 + 实心点
         if (hoverIndex >= 0 && hoverIndex < points.length && progress >= 1) {
             const p = points[hoverIndex];
             ctx.setLineDash([3, 5]);
-            ctx.strokeStyle = 'rgba(154,125,63,0.4)';
+            // hover 引导线改用墨绿
+            ctx.strokeStyle = 'rgba(44,58,48,0.4)';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(p.x, margin.top);
@@ -344,11 +503,11 @@ function initLineChart(data) {
             ctx.setLineDash([]);
             ctx.beginPath();
             ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(154,125,63,0.18)';
+            ctx.fillStyle = 'rgba(44,58,48,0.16)';
             ctx.fill();
             ctx.beginPath();
             ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = COLOR_ACCENT;
+            ctx.fillStyle = COLOR_DEEP;
             ctx.fill();
             ctx.lineWidth = 1.5;
             ctx.strokeStyle = '#f5f3ee';
@@ -376,14 +535,14 @@ function initLineChart(data) {
             ttValue.textContent = fmtNumber(p.data.value);
             tooltip.style.left = p.x + 'px';
             tooltip.style.top = p.y + 'px';
-            tooltip.classList.remove('opacity-0');
+            tooltip.style.opacity = '1';
         } else {
-            tooltip.classList.add('opacity-0');
+            tooltip.style.opacity = '0';
         }
     });
     canvas.addEventListener('mouseleave', () => {
         hoverIndex = -1;
-        tooltip.classList.add('opacity-0');
+        tooltip.style.opacity = '0';
     });
 
     window.addEventListener('resize', resize);
@@ -391,14 +550,14 @@ function initLineChart(data) {
 
     function frame(ts) {
         if (startTime === null) startTime = ts;
-        draw(ts - startTime);
+        if (!document.hidden) draw(ts - startTime);
         requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
 }
 
 // ==========================================
-// 3. 中间滚动数字引擎（含最新预测点的完整数据）
+// 3. 中心滚动数字
 // ==========================================
 function initTicker(data) {
     if (data.length === 0) return;
@@ -408,6 +567,8 @@ function initTicker(data) {
     let lastRateFormatted = "";
 
     function updateTicker() {
+        if (document.hidden) { requestAnimationFrame(updateTicker); return; }
+
         const now = Date.now();
         let currentValue = 0;
         let valuePerSecond = 0;
@@ -463,12 +624,12 @@ function initTicker(data) {
 initLineChart(CHART_DATA);
 initTicker(FULL_DATA);
 
-// Glow effect mouse tracking
+// 光晕跟随鼠标
 document.addEventListener('mousemove', (e) => {
     const glowEl = document.getElementById('hero-glow-el');
     if (!glowEl) return;
-    const x = (e.clientX / window.innerWidth - 0.5) * 40; // max 20px movement
-    const y = (e.clientY / window.innerHeight - 0.5) * 40;
+    const x = (e.clientX / window.innerWidth - 0.5) * 22;
+    const y = (e.clientY / window.innerHeight - 0.5) * 22;
     glowEl.style.transform = `translate(${x}px, ${y}px)`;
 });
 </script>
