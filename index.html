@@ -1,637 +1,258 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scorpius Capital Group</title>
-
-    <meta name="description" content="Scorpius Capital Group LLC — disciplined capital, compounding conviction.">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Scorpius Capital Group LLC">
-    <meta property="og:description" content="Disciplined capital. Compounding conviction.">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Scorpius Capital Group LLC">
-    <meta name="twitter:description" content="Disciplined capital. Compounding conviction.">
-    
-    <style>
-        /* ===== 字体（全局 Roboto） ===== */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-
-        :root {
-            --bg: #f5f3ee;
-            --ink: #211f1a;
-            --gold: #9a7d3f;
-            --gold-light: #c4a866;
-            --gold-text: #6f5826;   /* 加深后的金色，满足 WCAG AA */
-            --deep: #2c3a30;        /* 墨绿 */
-            --deep-light: #3e5343;
-        }
-
-        * { box-sizing: border-box; }
-        html, body { height: 100%; }
-        body {
-            margin: 0;
-            padding: 0;
-            background: var(--bg);
-            color: #2b2b2b;
-            font-family: 'Roboto', sans-serif;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-        }
-
-        /* 保留类名，统一指向 Roboto */
-        .font-display { font-family: 'Roboto', sans-serif; }
-        .font-mono {
-            font-family: 'Roboto', sans-serif;
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: 'tnum' 1;
-        }
-
-        /* ===== 布局骨架 ===== */
-        .stage { position: relative; width: 100%; height: 100vh; }
-        .layer { position: absolute; inset: 0; }
-        .z0  { z-index: 0; }
-        .z5  { z-index: 5; }
-        .z10 { z-index: 10; }
-        .z12 { z-index: 12; }
-        .z20 { z-index: 20; }
-        .z40 { z-index: 40; }
-        .z50 { z-index: 50; }
-
-        /* ===== 动画 ===== */
-        @keyframes riseIn {
-            from { opacity: 0; transform: translateY(12px); filter: blur(2px); }
-            to   { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        .rise { animation: riseIn 1.2s cubic-bezier(.16,1,.3,1) both; }
-        .rise-delay-1 { animation-delay: .3s; }
-
-        /* ===== 顶部金属金细线 ===== */
-        .top-hairline {
-            position: absolute; top: 0; left: 0; width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%);
-            opacity: 0.5;
-        }
-
-        /* ===== 背景图层 ===== */
-        #chart-canvas { cursor: crosshair; display: block; }
-
-        .grain {
-            pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            opacity: 0.055;
-            mix-blend-mode: multiply;
-        }
-
-        .vignette {
-            pointer-events: none;
-            background: linear-gradient(to bottom, rgba(245,243,238,0.6) 0%, transparent 50%, rgba(245,243,238,0.6) 100%);
-        }
-
-        /* ===== 中心呼吸光晕（跟随鼠标） ===== */
-        .hero-glow-container {
-            position: absolute; left: 50%; top: 50%;
-            width: 120vw; height: 120vh;
-            transform: translate(-50%, -50%);
-            animation: pulseGlow 6s ease-in-out infinite;
-            pointer-events: none; z-index: 12;
-        }
-        #hero-glow-el {
-            position: absolute; inset: 0;
-            background: radial-gradient(circle at center, rgba(154,125,63,0.12) 0%, rgba(245,243,238,0) 60%);
-            transition: transform 0.12s ease-out;
-            will-change: transform;
-        }
-        @keyframes pulseGlow {
-            0%   { opacity: .8; transform: translate(-50%, -50%) scale(1); }
-            50%  { opacity: 1;  transform: translate(-50%, -50%) scale(1.05); }
-            100% { opacity: .8; transform: translate(-50%, -50%) scale(1); }
-        }
-
-        /* ===== Header ===== */
-        header {
-            position: absolute; top: 0; left: 0; width: 100%;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 20px 24px;
-            background: linear-gradient(to bottom, rgba(245,243,238,0.9) 0%, rgba(245,243,238,0) 100%);
-        }
-        .brand {
-            font-size: 18px; font-weight: 600;
-            letter-spacing: 0.02em; white-space: nowrap;
-            color: #1a1a1a;
-        }
-
-        /* Docs 链接：扁平文字 + 金色下划线滑入，去掉边框盒子 */
-        .docs-link {
-            position: relative;
-            display: inline-flex; align-items: center; gap: 7px;
-            padding: 4px 2px;
-            font-size: 12px; font-weight: 500;
-            letter-spacing: 0.12em; text-transform: uppercase;
-            text-decoration: none;
-            color: var(--deep);
-            transition: color .3s ease;
-        }
-        .docs-link::after {
-            content: "";
-            position: absolute; left: 0; bottom: 0;
-            width: 100%; height: 1px;
-            background: var(--gold);
-            transform: scaleX(0); transform-origin: left;
-            transition: transform .35s cubic-bezier(.16,1,.3,1);
-        }
-        .docs-link:hover { color: var(--gold-text); }
-        .docs-link:hover::after { transform: scaleX(1); }
-        .docs-arrow { width: 13px; height: 13px; transition: transform .3s cubic-bezier(.16,1,.3,1); }
-        .docs-link:hover .docs-arrow { transform: translateX(3px); }
-
-        /* ===== 中心数字 ===== */
-        .hero-center {
-            position: absolute; inset: 0;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            text-align: center; padding: 0 16px;
-            pointer-events: none;
-        }
-        .ticker-row {
-            display: flex; align-items: baseline; justify-content: center;
-            flex-wrap: wrap;
-            font-weight: 600; letter-spacing: -0.02em;
-        }
-        #aum-ticker {
-            font-size: clamp(2.75rem, 13vw, 9rem);
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: 'tnum' 1;
-            background: linear-gradient(135deg, #211f1a 0%, #4a4539 100%);
-            -webkit-background-clip: text; background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        #rate-ticker {
-            margin-left: 14px;
-            font-size: clamp(0.7rem, 1.6vw, 1.1rem);
-            font-weight: 500;
-            letter-spacing: 0.05em; text-transform: uppercase;
-            white-space: nowrap;
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-            -webkit-background-clip: text; background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* ===== Tooltip：墨绿描边 + 墨绿数值 ===== */
-        #chart-tooltip {
-            position: absolute; z-index: 40;
-            opacity: 0; pointer-events: none;
-            padding: 8px 14px; border-radius: 8px;
-            background: rgba(255,255,255,0.82);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(44,58,48,0.22);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            transform: translate(-50%, -130%);
-            white-space: nowrap;
-            transition: opacity .22s ease;
-        }
-        #tt-date {
-            font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-            color: #8c8c8c; margin-bottom: 4px;
-        }
-        #tt-value {
-            font-size: 14px; font-weight: 600;
-            font-variant-numeric: tabular-nums;
-            color: var(--deep);
-        }
-
-        /* ===== 页脚：墨绿顶线 + 双色 ===== */
-        footer {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            height: 40px;
-            display: flex; align-items: center;
-            padding: 0 24px;
-            border-top: 1px solid rgba(44,58,48,0.2);
-            color: var(--deep-light);
-            font-size: 10px; font-weight: 400;
-            letter-spacing: 0.14em; text-transform: uppercase;
-        }
-        footer .accent { color: var(--gold-text); }
-
-        /* ===== 响应式 ===== */
-        @media (min-width: 768px) {
-            header { padding: 32px 48px; }
-            .brand { font-size: 24px; }
-            .docs-link { font-size: 14px; }
-            footer { padding: 0 48px; font-size: 12px; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .rise, .hero-glow-container { animation: none; }
-            .docs-link::after, .docs-arrow { transition: none; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kindle K线看盘</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body {
+    height:100%; width:100%; background:#fff; color:#000; overflow:hidden;
+    font-family:Helvetica,Arial,sans-serif;
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent;
+  }
+  #cv { display:block; width:100%; height:100%; touch-action:none; }
+  #info { position:absolute; left:10px; top:8px; line-height:1.15; pointer-events:none; }
+  #sym { font-size:24px; font-weight:bold; letter-spacing:.5px; }
+  #px  { font-size:16px; font-variant-numeric:tabular-nums; }
+  #pos { position:absolute; right:10px; top:8px; font-size:15px; pointer-events:none; }
+  #cd  { position:absolute; right:10px; top:30px; font-size:14px; font-variant-numeric:tabular-nums; pointer-events:none; }
+  #msg { position:absolute; left:50%; top:50%;
+    -webkit-transform:translate(-50%,-50%); transform:translate(-50%,-50%);
+    font-size:16px; color:#000; }
+</style>
 </head>
 <body>
-<div class="stage">
-
-    <div class="top-hairline z50"></div>
-
-    <!-- 折线图背景 -->
-    <div class="layer z0">
-        <canvas id="chart-canvas" role="img"
-                aria-label="Scorpius Capital Group performance trend line chart"></canvas>
-    </div>
-
-    <!-- 颗粒质感 -->
-    <div class="layer z5 grain"></div>
-
-    <!-- Hover tooltip -->
-    <div id="chart-tooltip">
-        <div id="tt-date"></div>
-        <div id="tt-value"></div>
-    </div>
-
-    <!-- 上下渐隐 -->
-    <div class="layer z10 vignette"></div>
-
-    <!-- 呼吸 + 跟随鼠标光晕 -->
-    <div class="hero-glow-container"><div id="hero-glow-el"></div></div>
-
-    <!-- Header -->
-    <header class="z50 rise">
-        <div class="brand font-display">Scorpius Capital Group LLC</div>
-        <a href="docs/index.html" class="docs-link" aria-label="Open documentation">
-            Docs
-            <svg class="docs-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-        </a>
-    </header>
-
-    <!-- 中心数字（副标题已移除） -->
-    <div class="hero-center z20">
-        <div class="ticker-row">
-            <span class="font-mono" id="aum-ticker" aria-live="polite" aria-atomic="true">0</span>
-            <span class="font-mono" id="rate-ticker">0/s</span>
-        </div>
-    </div>
-
-    <!-- 页脚 -->
-    <footer class="z50">
-        <span>&copy; 2026 <span class="accent">Scorpius Capital Group LLC</span>. All rights reserved.</span>
-    </footer>
-</div>
-
+<canvas id="cv"></canvas>
+<div id="info"><div id="sym"></div><div id="px"></div></div>
+<div id="pos"></div>
+<div id="cd"></div>
+<div id="msg">加载中…</div>
 <script>
-// ==========================================
-// 1. 数据
-// ==========================================
-const AUM_CSV_TEXT = `Date,Value
-20260612,100
-20260618,101
-20270101,200`;
+(function(){
+  // ====== 品种列表（可自行增删） ======
+  var symbols = [
+    // Crypto
+    "BTC", "HYPE", "ZEC", "XRP",
+    // Stocks & Indices
+    "xyz:XYZ100", "xyz:SPCX", "xyz:DRAM", "xyz:MU",
+    "xyz:NVDA", "xyz:SKHX", "xyz:SNDK",
+    // Commodities
+    "xyz:BRENTOIL"
+  ];
 
-function parseData() {
-    const lines = AUM_CSV_TEXT.trim().split('\n').slice(1);
-    return lines.map(line => {
-        const [dateStr, valueStr] = line.split(',');
-        const d = dateStr.trim();
-        const year = parseInt(d.slice(0, 4), 10);
-        const month = parseInt(d.slice(4, 6), 10) - 1;
-        const day = parseInt(d.slice(6, 8), 10);
-        const value = parseFloat(valueStr.trim());
-        const timestamp = new Date(year, month, day).getTime();
-        return { dateStr: d, year, month, day, value, timestamp };
-    }).filter(d => !isNaN(d.timestamp)).sort((a, b) => a.timestamp - b.timestamp);
-}
+  var API = "https://api.hyperliquid.xyz/info";
+  var INTERVAL = "1h";
+  var INTERVAL_MS = 3600 * 1000;
+  var BARS = 100;
+  var EMA_PERIOD = 20;
 
-const FULL_DATA = parseData();
-const CHART_DATA = FULL_DATA.slice(0, -1).length ? FULL_DATA.slice(0, -1) : FULL_DATA.slice();
+  var idx = 0;
+  var candles = [];
+  var reqToken = 0;
 
-function fmtDate(d) {
-    const p = n => String(n).padStart(2, '0');
-    return `${d.year}-${p(d.month + 1)}-${p(d.day)}`;
-}
-function fmtNumber(v) {
-    return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-function fmtRate(v) {
-    if (!isFinite(v) || v === 0) return "0/s";
-    const abs = Math.abs(v);
-    let decimals = 2;
-    if (abs < 1) decimals = Math.ceil(-Math.log10(abs)) + 1;
-    decimals = Math.max(2, Math.min(decimals, 12));
-    return v.toFixed(decimals) + "/s";
-}
-const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+  var cv = document.getElementById("cv");
+  var ctx = cv.getContext("2d");
+  var elSym = document.getElementById("sym");
+  var elPx  = document.getElementById("px");
+  var elPos = document.getElementById("pos");
+  var elCd  = document.getElementById("cd");
+  var elMsg = document.getElementById("msg");
 
-// ==========================================
-// 2. 折线图引擎
-// ==========================================
-function initLineChart(data) {
-    const canvas = document.getElementById('chart-canvas');
-    const ctx = canvas.getContext('2d');
-    const tooltip = document.getElementById('chart-tooltip');
-    const ttDate = document.getElementById('tt-date');
-    const ttValue = document.getElementById('tt-value');
+  function fmt(n){
+    if (n >= 1000) return n.toFixed(0);
+    if (n >= 1)    return n.toFixed(2);
+    if (n >= 0.01) return n.toFixed(4);
+    return n.toPrecision(4);
+  }
 
-    let margin = { left: 48, right: 48, top: 170, bottom: 96 };
-    let width, height, dpr;
-    let points = [];
-    let yMin = 0, yMax = 1;
-    let hoverIndex = -1;
-    let startTime = null;
-    const REVEAL_MS = 1700;
+  function fetchCandles(coin, bars, cb){
+    var end = (new Date()).getTime();
+    var start = end - bars * INTERVAL_MS;
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", API, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function(){
+      if (xhr.readyState !== 4) return;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          var data = JSON.parse(xhr.responseText) || [];
+          var out = [], i, d;
+          for (i = 0; i < data.length; i++) {
+            d = data[i];
+            out.push({ t: d.t, o: +d.o, h: +d.h, l: +d.l, c: +d.c });
+          }
+          cb(null, out);
+        } catch (e) { cb(e); }
+      } else {
+        cb(new Error("HTTP " + xhr.status));
+      }
+    };
+    xhr.onerror = function(){ cb(new Error("网络错误")); };
+    xhr.send(JSON.stringify({
+      type: "candleSnapshot",
+      req: { coin: coin, interval: INTERVAL, startTime: start, endTime: end }
+    }));
+  }
 
-    const COLOR_LINE = '#23211c';
-    const COLOR_ACCENT = '#9a7d3f';
-    const COLOR_DEEP = '#2c3a30';
+  function calcEMA(arr){
+    var k = 2 / (EMA_PERIOD + 1), ema = null, out = [], i;
+    for (i = 0; i < arr.length; i++) {
+      var p = arr[i].c;
+      ema = (ema === null) ? p : p * k + ema * (1 - k);
+      out.push(ema);
+    }
+    return out;
+  }
 
-    function resize() {
-        dpr = window.devicePixelRatio || 1;
-        width = window.innerWidth;
-        height = window.innerHeight;
-        const mobile = width < 640;
-        margin = {
-            left: mobile ? 24 : 48,
-            right: mobile ? 24 : 48,
-            top: mobile ? 120 : 170,
-            bottom: mobile ? 74 : 96
-        };
-        canvas.width = Math.floor(width * dpr);
-        canvas.height = Math.floor(height * dpr);
-        canvas.style.width = width + 'px';
-        canvas.style.height = height + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        computePoints();
+  function resize(){
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function draw(){
+    var W = cv.clientWidth, H = cv.clientHeight, i, d;
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+    if (!candles.length) return;
+
+    // 无价格轴 / 无时间轴，K线铺满整个屏幕
+    var padL = 4, padR = 4, padT = 10, padB = 8;
+    var cw = W - padL - padR, ch = H - padT - padB, n = candles.length;
+
+    var hi = -Infinity, lo = Infinity;
+    for (i = 0; i < n; i++) { d = candles[i]; if (d.h > hi) hi = d.h; if (d.l < lo) lo = d.l; }
+    var ema = calcEMA(candles);
+    for (i = 0; i < ema.length; i++) { if (ema[i] > hi) hi = ema[i]; if (ema[i] < lo) lo = ema[i]; }
+    var pad = (hi - lo) * 0.04 || 1; hi += pad; lo -= pad;
+    var span = hi - lo, slot = cw / n;
+    function x2(i){ return padL + (i + 0.5) * slot; }
+    function y2(p){ return padT + (hi - p) / span * ch; }
+    var bw = Math.max(1, slot * 0.6);
+
+    // 影线（黑）
+    ctx.lineWidth = 1; ctx.strokeStyle = "#000"; ctx.beginPath();
+    for (i = 0; i < n; i++) {
+      d = candles[i]; var x = Math.round(x2(i)) + 0.5;
+      ctx.moveTo(x, y2(d.h)); ctx.lineTo(x, y2(d.l));
+    }
+    ctx.stroke();
+
+    // 下跌：实心黑
+    ctx.fillStyle = "#000";
+    for (i = 0; i < n; i++) {
+      d = candles[i]; if (d.c >= d.o) continue;
+      var yo = y2(d.o), yc = y2(d.c);
+      ctx.fillRect(x2(i) - bw / 2, Math.min(yo, yc), bw, Math.max(1, Math.abs(yc - yo)));
+    }
+    // 上涨：空心白
+    for (i = 0; i < n; i++) {
+      d = candles[i]; if (d.c < d.o) continue;
+      var yo2 = y2(d.o), yc2 = y2(d.c);
+      var top = Math.min(yo2, yc2), bh = Math.max(1, Math.abs(yc2 - yo2));
+      ctx.fillStyle = "#fff"; ctx.fillRect(x2(i) - bw / 2, top, bw, bh);
+      ctx.strokeRect(Math.round(x2(i) - bw / 2) + 0.5, Math.round(top) + 0.5, Math.round(bw), Math.round(bh));
     }
 
-    function computePoints() {
-        const chartW = width - margin.left - margin.right;
-        const chartH = height - margin.top - margin.bottom;
-        const values = data.map(d => d.value);
-        let vMin = Math.min(...values);
-        let vMax = Math.max(...values);
-        if (vMin === vMax) { vMin = vMin * 0.9; vMax = vMax * 1.1 || 1; }
-        const pad = (vMax - vMin) * 0.12;
-        yMin = Math.max(0, vMin - pad);
-        yMax = vMax + pad;
-        points = data.map((d, i) => {
-            const x = data.length === 1
-                ? margin.left + chartW / 2
-                : margin.left + (i / (data.length - 1)) * chartW;
-            const y = margin.top + chartH - (d.value - yMin) / (yMax - yMin) * chartH;
-            return { x, y, data: d };
-        });
+    // EMA20（灰线）
+    ctx.strokeStyle = "#888"; ctx.lineWidth = 1.4; ctx.beginPath();
+    for (i = 0; i < n; i++) {
+      var xx = x2(i), yy = y2(ema[i]);
+      if (i) ctx.lineTo(xx, yy); else ctx.moveTo(xx, yy);
     }
+    ctx.stroke();
+  }
 
-    function smoothCurveTo(pts) {
-        for (let i = 0; i < pts.length - 1; i++) {
-            const p0 = pts[i === 0 ? 0 : i - 1];
-            const p1 = pts[i];
-            const p2 = pts[i + 1];
-            const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
-            const cp1x = p1.x + (p2.x - p0.x) / 6;
-            const cp1y = p1.y + (p2.y - p0.y) / 6;
-            const cp2x = p2.x - (p3.x - p1.x) / 6;
-            const cp2y = p2.y - (p3.y - p1.y) / 6;
-            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
-        }
+  // 增量合并：只拉最新几根，覆盖未收盘那根或追加新K线
+  function merge(base, fresh){
+    if (!fresh.length) return base;
+    var arr = base.slice(), i, f;
+    for (i = 0; i < fresh.length; i++) {
+      f = fresh[i];
+      if (arr.length && arr[arr.length - 1].t === f.t) arr[arr.length - 1] = f;
+      else if (!arr.length || f.t > arr[arr.length - 1].t) {
+        arr.push(f); if (arr.length > BARS) arr.shift();
+      }
     }
-    function setLabelSpacing(px) { try { ctx.letterSpacing = px; } catch (e) {} }
-    const isMobile = () => width < 640;
+    return arr;
+  }
 
-    function draw(elapsed) {
-        const progress = easeOutCubic(Math.min(elapsed / REVEAL_MS, 1));
-        ctx.clearRect(0, 0, width, height);
-        const chartH = height - margin.top - margin.bottom;
-        const baseY = height - margin.bottom;
-        const gridSteps = 5;
-
-        ctx.font = '11px "Roboto", sans-serif';
-        ctx.textAlign = 'right';
-        setLabelSpacing('0.5px');
-        for (let i = 0; i <= gridSteps; i++) {
-            const y = margin.top + i * (chartH / gridSteps);
-            ctx.strokeStyle = 'rgba(44,58,48,0.06)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(margin.left, y);
-            ctx.lineTo(width - margin.right, y);
-            ctx.stroke();
-            if (!isMobile()) {
-                const val = yMax - i * (yMax - yMin) / gridSteps;
-                const initialValue = data[0] ? data[0].value : 1;
-                const yieldRate = initialValue !== 0 ? ((val - initialValue) / initialValue) * 100 : 0;
-                // 加深后的金色，满足 AA 对比度
-                ctx.fillStyle = 'rgba(111,88,38,0.9)';
-                ctx.fillText(fmtNumber(yieldRate) + '%', width - margin.right - 8, y - 6);
-            }
-        }
-        setLabelSpacing('0px');
-
-        ctx.strokeStyle = 'rgba(44,58,48,0.16)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(margin.left, baseY);
-        ctx.lineTo(width - margin.right, baseY);
-        ctx.stroke();
-
-        if (points.length === 0) return;
-
-        const revealX = margin.left + (width - margin.left - margin.right) * progress;
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0, 0, revealX, height);
-        ctx.clip();
-
-        const grad = ctx.createLinearGradient(0, margin.top, 0, baseY);
-        grad.addColorStop(0, 'rgba(154,125,63,0.13)');
-        grad.addColorStop(1, 'rgba(154,125,63,0.00)');
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, baseY);
-        ctx.lineTo(points[0].x, points[0].y);
-        smoothCurveTo(points);
-        ctx.lineTo(points[points.length - 1].x, baseY);
-        ctx.closePath();
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        smoothCurveTo(points);
-        ctx.strokeStyle = COLOR_LINE;
-        ctx.lineWidth = 1.6;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.stroke();
-
-        const labelStep = Math.max(1, Math.ceil(points.length / (isMobile() ? 4 : 7)));
-        ctx.textAlign = 'center';
-        ctx.font = '10.5px "Roboto", sans-serif';
-        setLabelSpacing('0.6px');
-        points.forEach((p, i) => {
-            if (i % labelStep !== 0 && i !== points.length - 1) return;
-            ctx.fillStyle = 'rgba(44,58,48,0.5)';
-            ctx.fillText(fmtDate(p.data), p.x, baseY + 22);
-        });
-        setLabelSpacing('0px');
-        ctx.restore();
-
-        if (progress >= 1) {
-            const last = points[points.length - 1];
-            const breathe = (Math.sin(elapsed / 950) + 1) / 2;
-            const haloR = 7 + breathe * 3.5;
-            ctx.beginPath();
-            ctx.arc(last.x, last.y, haloR, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(154,125,63,${0.10 + breathe * 0.10})`;
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(last.x, last.y, 3.2, 0, Math.PI * 2);
-            ctx.fillStyle = COLOR_ACCENT;
-            ctx.fill();
-        }
-
-        if (hoverIndex >= 0 && hoverIndex < points.length && progress >= 1) {
-            const p = points[hoverIndex];
-            ctx.setLineDash([3, 5]);
-            // hover 引导线改用墨绿
-            ctx.strokeStyle = 'rgba(44,58,48,0.4)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(p.x, margin.top);
-            ctx.lineTo(p.x, baseY);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(44,58,48,0.16)';
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = COLOR_DEEP;
-            ctx.fill();
-            ctx.lineWidth = 1.5;
-            ctx.strokeStyle = '#f5f3ee';
-            ctx.stroke();
-        }
-    }
-
-    function nearestIndex(mx) {
-        let best = -1, bestDist = Infinity;
-        points.forEach((p, i) => {
-            const d = Math.abs(p.x - mx);
-            if (d < bestDist) { bestDist = d; best = i; }
-        });
-        return bestDist <= 40 ? best : -1;
-    }
-
-    canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const mx = e.clientX - rect.left;
-        const idx = nearestIndex(mx);
-        hoverIndex = idx;
-        if (idx >= 0) {
-            const p = points[idx];
-            ttDate.textContent = fmtDate(p.data);
-            ttValue.textContent = fmtNumber(p.data.value);
-            tooltip.style.left = p.x + 'px';
-            tooltip.style.top = p.y + 'px';
-            tooltip.style.opacity = '1';
-        } else {
-            tooltip.style.opacity = '0';
-        }
+  function refreshLatest(){
+    if (document.hidden) return;
+    var token = reqToken;
+    fetchCandles(symbols[idx], 3, function(err, fresh){
+      if (token !== reqToken) return;
+      if (err || !fresh || !fresh.length) return;
+      candles = merge(candles, fresh);
+      if (candles.length) elPx.textContent = fmt(candles[candles.length - 1].c);
+      draw();
     });
-    canvas.addEventListener('mouseleave', () => {
-        hoverIndex = -1;
-        tooltip.style.opacity = '0';
+  }
+
+  function tickCountdown(){
+    var ms = INTERVAL_MS - ((new Date()).getTime() % INTERVAL_MS);
+    var mins = Math.max(1, Math.ceil(ms / 60000));
+    elCd.textContent = "距收盘 " + mins + " 分";
+  }
+
+  function load(){
+    var coin = symbols[idx];
+    elSym.textContent = coin.replace("xyz:", "");
+    elPos.textContent = (idx + 1) + "/" + symbols.length;
+    elPx.textContent = "";
+    var token = ++reqToken;
+    elMsg.style.display = "block"; elMsg.textContent = "加载中…";
+    fetchCandles(coin, BARS, function(err, data){
+      if (token !== reqToken) return;
+      if (err) { elMsg.textContent = "加载失败: " + err.message; elMsg.style.display = "block"; return; }
+      candles = data;
+      elMsg.style.display = "none";
+      if (data.length) elPx.textContent = fmt(data[data.length - 1].c);
+      draw();
+      tickCountdown();
     });
+  }
 
-    window.addEventListener('resize', resize);
-    resize();
+  function go(step){
+    idx = (idx + step + symbols.length) % symbols.length;
+    load();
+  }
 
-    function frame(ts) {
-        if (startTime === null) startTime = ts;
-        if (!document.hidden) draw(ts - startTime);
-        requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-}
+  // ====== 点击左侧：上一个；点击右侧：下一个 ======
+  function tapX(e){
+    if (e.clientX != null) return e.clientX;
+    if (e.pageX != null) return e.pageX;
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+    return 0;
+  }
+  function onTap(x){ if (x < window.innerWidth / 2) go(-1); else go(1); }
+  document.addEventListener("click", function(e){ onTap(tapX(e)); }, false);
+  // 桌面测试：方向键
+  window.addEventListener("keydown", function(e){
+    var k = e.keyCode || e.which;
+    if (k === 37 || k === 38) go(-1);
+    if (k === 39 || k === 40) go(1);
+  }, false);
 
-// ==========================================
-// 3. 中心滚动数字
-// ==========================================
-function initTicker(data) {
-    if (data.length === 0) return;
-    const tickerEl = document.getElementById('aum-ticker');
-    const rateEl = document.getElementById('rate-ticker');
-    let lastFormatted = "";
-    let lastRateFormatted = "";
+  var rt;
+  window.addEventListener("resize", function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){ resize(); draw(); }, 150);
+  }, false);
 
-    function updateTicker() {
-        if (document.hidden) { requestAnimationFrame(updateTicker); return; }
+  document.addEventListener("visibilitychange", function(){
+    if (!document.hidden) { refreshLatest(); tickCountdown(); }
+  }, false);
 
-        const now = Date.now();
-        let currentValue = 0;
-        let valuePerSecond = 0;
-
-        if (now <= data[0].timestamp) {
-            const startOfYear = new Date(data[0].year, 0, 1).getTime();
-            if (now < startOfYear) {
-                currentValue = 0; valuePerSecond = 0;
-            } else {
-                const ratio = (now - startOfYear) / (data[0].timestamp - startOfYear);
-                currentValue = ratio * data[0].value;
-                valuePerSecond = data[0].value / ((data[0].timestamp - startOfYear) / 1000);
-            }
-        } else if (now >= data[data.length - 1].timestamp) {
-            currentValue = data[data.length - 1].value;
-            valuePerSecond = 0;
-        } else {
-            for (let i = 0; i < data.length - 1; i++) {
-                if (now >= data[i].timestamp && now < data[i + 1].timestamp) {
-                    const start = data[i].timestamp;
-                    const end = data[i + 1].timestamp;
-                    const ratio = (now - start) / (end - start);
-                    currentValue = data[i].value + ratio * (data[i + 1].value - data[i].value);
-                    valuePerSecond = (data[i + 1].value - data[i].value) / ((end - start) / 1000);
-                    break;
-                }
-            }
-        }
-
-        const integerLength = Math.floor(currentValue).toString().length;
-        let decimalPlaces;
-        if (integerLength >= 9) decimalPlaces = 0;
-        else if (integerLength === 1) decimalPlaces = 9;
-        else decimalPlaces = 9 - integerLength;
-
-        const fixedString = currentValue.toFixed(decimalPlaces);
-        const [integerPart, decimalPart] = fixedString.split('.');
-        const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, "<span style='display:inline-block; width:0.12em;'></span>");
-        const formatted = decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
-        const formattedRate = fmtRate(valuePerSecond);
-
-        if (formatted !== lastFormatted) { tickerEl.innerHTML = formatted; lastFormatted = formatted; }
-        if (formattedRate !== lastRateFormatted) { rateEl.textContent = formattedRate; lastRateFormatted = formattedRate; }
-
-        requestAnimationFrame(updateTicker);
-    }
-    requestAnimationFrame(updateTicker);
-}
-
-// ==========================================
-// 4. 启动
-// ==========================================
-initLineChart(CHART_DATA);
-initTicker(FULL_DATA);
-
-// 光晕跟随鼠标
-document.addEventListener('mousemove', (e) => {
-    const glowEl = document.getElementById('hero-glow-el');
-    if (!glowEl) return;
-    const x = (e.clientX / window.innerWidth - 0.5) * 22;
-    const y = (e.clientY / window.innerHeight - 0.5) * 22;
-    glowEl.style.transform = `translate(${x}px, ${y}px)`;
-});
+  resize();
+  load();
+  tickCountdown();
+  // 每分钟刷新一次（同时更新倒计时），对电子墨水屏友好
+  setInterval(function(){ refreshLatest(); tickCountdown(); }, 60 * 1000);
+})();
 </script>
 </body>
 </html>
