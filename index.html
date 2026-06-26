@@ -16,11 +16,9 @@
   }
   #stage { position:absolute; top:0; left:0; background:#fff; overflow:hidden; }
   #cv { display:block; width:100%; height:100%; touch-action:none; }
-  #info { position:absolute; left:10px; top:8px; line-height:1.15; pointer-events:none; }
+  #info { position:absolute; right:10px; top:8px; line-height:1.2; text-align:right; pointer-events:none; }
   #sym { font-size:24px; font-weight:bold; letter-spacing:.5px; }
-  #px  { font-size:16px; font-variant-numeric:tabular-nums; }
-  #pos { position:absolute; right:10px; top:8px; font-size:15px; pointer-events:none; }
-  #cd  { position:absolute; right:10px; top:30px; font-size:14px; font-variant-numeric:tabular-nums; pointer-events:none; }
+  #meta { font-size:13px; font-variant-numeric:tabular-nums; }
   #msg { position:absolute; left:50%; top:50%;
     -webkit-transform:translate(-50%,-50%); transform:translate(-50%,-50%);
     font-size:16px; color:#000; }
@@ -29,9 +27,7 @@
 <body>
 <div id="stage">
 <canvas id="cv"></canvas>
-<div id="info"><div id="sym"></div><div id="px"></div></div>
-<div id="pos"></div>
-<div id="cd"></div>
+<div id="info"><div id="sym"></div><div id="meta"></div></div>
 <div id="msg">加载中…</div>
 </div>
 <script>
@@ -62,9 +58,7 @@
   var cv = document.getElementById("cv");
   var ctx = cv.getContext("2d");
   var elSym = document.getElementById("sym");
-  var elPx  = document.getElementById("px");
-  var elPos = document.getElementById("pos");
-  var elCd  = document.getElementById("cd");
+  var elMeta = document.getElementById("meta");
   var elMsg = document.getElementById("msg");
 
   function fmt(n){
@@ -129,7 +123,7 @@
       stage.style.width = H + "px";
       stage.style.height = W + "px";
       stage.style.transformOrigin = "0 0";
-      stage.style.transform = "rotate(90deg) translateY(-100%)";
+      stage.style.transform = "rotate(-90deg) translateX(-100%)";
     } else {
       rotated = false;
       stage.style.width = W + "px";
@@ -225,7 +219,6 @@
       if (token !== reqToken) return;
       if (err || !fresh || !fresh.length) return;
       candles = merge(candles, fresh);
-      if (candles.length) elPx.textContent = fmt(candles[candles.length - 1].c);
       draw();
     });
   }
@@ -233,14 +226,12 @@
   function tickCountdown(){
     var ms = INTERVAL_MS - ((new Date()).getTime() % INTERVAL_MS);
     var mins = Math.max(1, Math.ceil(ms / 60000));
-    elCd.textContent = "距收盘 " + mins + " 分";
+    elMeta.textContent = (idx + 1) + "/" + symbols.length + " · 距收盘 " + mins + " 分";
   }
 
   function load(){
     var coin = symbols[idx];
     elSym.textContent = coin.replace("xyz:", "");
-    elPos.textContent = (idx + 1) + "/" + symbols.length;
-    elPx.textContent = "";
     var token = ++reqToken;
     elMsg.style.display = "block"; elMsg.textContent = "加载中…";
     fetchCandles(coin, BARS, function(err, data){
@@ -248,7 +239,6 @@
       if (err) { elMsg.textContent = "加载失败: " + err.message; elMsg.style.display = "block"; return; }
       candles = data;
       elMsg.style.display = "none";
-      if (data.length) elPx.textContent = fmt(data[data.length - 1].c);
       draw();
       tickCountdown();
     });
@@ -270,7 +260,7 @@
   }
   function onTap(p){
     // 旋转成横屏后，视觉“左/右”对应物理 Y 轴
-    var prev = rotated ? (p.y < window.innerHeight / 2) : (p.x < window.innerWidth / 2);
+    var prev = rotated ? (p.y > window.innerHeight / 2) : (p.x < window.innerWidth / 2);
     if (prev) go(-1); else go(1);
   }
   document.addEventListener("click", function(e){
