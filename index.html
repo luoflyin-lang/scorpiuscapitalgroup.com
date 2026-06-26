@@ -43,6 +43,9 @@
     "xyz:BRENTOIL"
   ];
 
+  // 数据源：Hyperliquid /info 接口。中国大陆直连被墙，需要代理。
+  // 若你有国内可访问的反向代理镜像（接口与 Hyperliquid /info 完全一致），
+  // 把下面地址换成镜像地址即可彻底免代理。
   var API = "https://api.hyperliquid.xyz/info";
   var INTERVAL = "1h";
   var INTERVAL_MS = 3600 * 1000;
@@ -52,6 +55,22 @@
   var idx = 0;
   var candles = [];
   var reqToken = 0;
+  var cache = {};
+
+  // ====== 本地缓存：翻页/重开时即时复用，减少拉取次数 ======
+  function cacheKey(coin){ return "kline:" + INTERVAL + ":" + BARS + ":" + coin; }
+  function saveCache(coin, arr){
+    cache[coin] = arr;
+    try { localStorage.setItem(cacheKey(coin), JSON.stringify({ t: (new Date()).getTime(), bars: arr })); } catch (e) {}
+  }
+  function getCache(coin){
+    if (cache[coin]) return cache[coin];
+    try {
+      var raw = localStorage.getItem(cacheKey(coin));
+      if (raw) { var o = JSON.parse(raw); if (o && o.bars && o.bars.length) { cache[coin] = o.bars; return o.bars; } }
+    } catch (e) {}
+    return null;
+  }
 
   var stage = document.getElementById("stage");
   var rotated = false;
@@ -165,6 +184,14 @@
     function y2(p){ return padT + (hi - p) / span * ch; }
     var bw = Math.max(1, slot * 0.6);
 
+    // EMA20（灰线，先画 => 处于 K 线下层）
+    ctx.strokeStyle = "#888"; ctx.lineWidth = 1.4; ctx.beginPath();
+    for (i = 0; i < n; i++) {
+      var xx = x2(i), yy = y2(ema[i]);
+      if (i) ctx.lineTo(xx, yy); else ctx.moveTo(xx, yy);
+    }
+    ctx.stroke();
+
     // 影线（黑）
     ctx.lineWidth = 1; ctx.strokeStyle = "#000"; ctx.beginPath();
     for (i = 0; i < n; i++) {
@@ -189,13 +216,6 @@
       ctx.strokeRect(Math.round(x2(i) - bw / 2) + 0.5, Math.round(top) + 0.5, Math.round(bw), Math.round(bh));
     }
 
-    // EMA20（灰线）
-    ctx.strokeStyle = "#888"; ctx.lineWidth = 1.4; ctx.beginPath();
-    for (i = 0; i < n; i++) {
-      var xx = x2(i), yy = y2(ema[i]);
-      if (i) ctx.lineTo(xx, yy); else ctx.moveTo(xx, yy);
-    }
-    ctx.stroke();
   }
 
   // 增量合并：只拉最新几根，覆盖未收盘那根或追加新K线
@@ -213,12 +233,14 @@
   }
 
   function refreshLatest(){
-    if (document.hidden) return;
+    if (document.hidden || !candles.length) return;
+    var coin = symbols[idx];
     var token = reqToken;
-    fetchCandles(symbols[idx], 3, function(err, fresh){
+    fetchCandles(coin, 3, function(err, fresh){
       if (token !== reqToken) return;
       if (err || !fresh || !fresh.length) return;
       candles = merge(candles, fresh);
+      saveCache(coin, candles);
       draw();
     });
   }
@@ -233,11 +255,34 @@
     var coin = symbols[idx];
     elSym.textContent = coin.replace("xyz:", "");
     var token = ++reqToken;
+
+    // 先用缓存即时渲染：翻页不再每次全量重拉
+    var cached = getCache(coin);
+    if (cached && cached.length) {
+      candles = cached.slice();
+      elMsg.style.display = "none";
+      draw();
+      tickCountdown();
+      var lastT = candles[candles.length - 1].t;
+      if ((new Date()).getTime() - lastT > 5 * INTERVAL_MS) {
+        // 缓存过旧：后台静默全量刷新
+        fetchCandles(coin, BARS, function(err, data){
+          if (token !== reqToken) return;
+          if (err || !data || !data.length) return;
+          candles = data; saveCache(coin, candles); draw(); tickCountdown();
+        });
+      } else {
+        refreshLatest(); // 仅增量拉取最新几根
+      }
+      return;
+    }
+
     elMsg.style.display = "block"; elMsg.textContent = "加载中…";
     fetchCandles(coin, BARS, function(err, data){
       if (token !== reqToken) return;
       if (err) { elMsg.textContent = "加载失败: " + err.message; elMsg.style.display = "block"; return; }
       candles = data;
+      saveCache(coin, candles);
       elMsg.style.display = "none";
       draw();
       tickCountdown();
