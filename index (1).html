@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Kindle K线看盘</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body {
+    height:100%; width:100%; background:#000; color:#fff; overflow:hidden;
+    font-family:Helvetica,Arial,sans-serif;
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent;
+  }
+  #stage { position:absolute; top:0; left:0; background:#000; overflow:hidden; }
+  #cv { display:block; width:100%; height:100%; touch-action:none; }
+  #info { position:absolute; right:10px; top:8px; line-height:1.2; text-align:right; pointer-events:none; }
+  #sym { font-size:24px; font-weight:bold; letter-spacing:.5px; }
+  #meta { font-size:13px; font-variant-numeric:tabular-nums; }
+  #msg { position:absolute; left:50%; top:50%;
+    -webkit-transform:translate(-50%,-50%); transform:translate(-50%,-50%);
+    font-size:16px; color:#fff; }
+</style>
+</head>
+<body>
+<div id="stage">
+<canvas id="cv"></canvas>
+<div id="info"><div id="sym"></div><div id="meta"></div></div>
+<div id="msg">加载中…</div>
+</div>
+<script>
+(function(){
+  // ====== 品种列表（可自行增删） ======
+  var symbols = [
+// 🪙 Crypto & Tokens
+  "BTC", "HYPE", "ETH", "SOL", "ZEC", "NEAR", "XRP", "WLD", 
+  "LIT", "AAVE", "XMR",
+
+  // 📈 Stocks & Indices
+  "xyz:XYZ100", "xyz:SPCX", "xyz:MU", "xyz:NVDA", 
+  "xyz:GOOGL", "xyz:MRVL", "xyz:SNDK", "xyz:MSFT", "xyz:DRAM", "xyz:INTC", 
+  "xyz:NBIS",
+
+  // 🛢️ Commodities
+  "xyz:BRENTOIL", "xyz:GOLD", "xyz:SILVER",
+  ];
+
+  // 数据源：Hyperliquid /info 接口。中国大陆直连被墙，需要代理。
+  // 若你有国内可访问的反向代理镜像（接口与 Hyperliquid /info 完全一致），
+  // 把下面地址换成镜像地址即可彻底免代理。
+  var API = "https://api.hyperliquid.xyz/info";
+  var INTERVAL = "1h";
+  var INTERVAL_MS = 3600 * 1000;
+  var BARS = 100;
+  var EMA_PERIOD = 20;
+
+  var idx = 0;
+  var candles = [];
+  var reqToken = 0;
+  var cache = {};
+  var COLOR_UP = "#0ecb81";   // 上涨：绿
+  var COLOR_DOWN = "#f6465d"; // 下跌：红
+
+  // ====== 本地缓存：翻页/重开时即时复用，减少拉取次数 ======
+  function cacheKey(coin){ return "kline:" + INTERVAL + ":" + BARS + ":" + coin; }
+  function saveCache(coin, arr){
+    cache[coin] = arr;
+    try { localStorage.setItem(cacheKey(coin), JSON.stringify({ t: (new Date()).getTime(), bars: arr })); } catch (e) {}
+  }
+  function getCache(coin){
+    if (cache[coin]) return cache[coin];
+    try {
+      var raw = localStorage.getItem(cacheKey(coin));
+      if (raw) { var o = JSON.parse(raw); if (o && o.bars && o.bars.length) { cache[coin] = o.bars; return o.bars; } }
+    } catch (e) {}
+    return null;
+  }
+
+  var stage = document.getElementById("stage");
+  var rotated = false;
+  var cv = document.getElementById("cv");
+  var ctx = cv.getContext("2d");
+  var elSym = document.getElementById("sym");
+  var elMeta = document.getElementById("meta");
+  var elMsg = document.getElementById("msg");
+
+  function fmt(n){
+    if (n >= 1000) return n.toFixed(0);
+    if (n >= 1)    return n.toFixed(2);
+    if (n >= 0.01) return n.toFixed(4);
+    return n.toPrecision(4);
+  }
+
+  function fetchCandles(coin, bars, cb){
+    var end = (new Date()).getTime();
+    var start = end - bars * INTERVAL_MS;
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", API, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function(){
+      if (xhr.readyState !== 4) return;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          var data = JSON.parse(xhr.responseText) || [];
+          var out = [], i, d;
+          for (i = 0; i < data.length; i++) {
+            d = data[i];
+            out.push({ t: d.t, o: +d.o, h: +d.h, l: +d.l, c: +d.c });
+          }
+          cb(null, out);
+        } catch (e) { cb(e); }
+      } else {
+        cb(new Error("HTTP " + xhr.status));
+      }
+    };
+    xhr.onerror = function(){ cb(new Error("网络错误")); };
+    xhr.send(JSON.stringify({
+      type: "candleSnapshot",
+      req: { coin: coin, interval: INTERVAL, startTime: start, endTime: end }
+    }));
+  }
+
+  function calcEMA(arr){
+    var k = 2 / (EMA_PERIOD + 1), ema = null, out = [], i;
+    for (i = 0; i < arr.length; i++) {
+      var p = arr[i].c;
+      ema = (ema === null) ? p : p * k + ema * (1 - k);
+      out.push(ema);
+    }
+    return out;
+  }
+
+  function resize(){
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // 纵屏设备上强制旋转为横屏（手持 Kindle 横着看）
+  function layout(){
+    var W = window.innerWidth, H = window.innerHeight;
+    if (H > W) {
+      rotated = true;
+      stage.style.width = H + "px";
+      stage.style.height = W + "px";
+      stage.style.transformOrigin = "0 0";
+      stage.style.transform = "rotate(-90deg) translateX(-100%)";
+    } else {
+      rotated = false;
+      stage.style.width = W + "px";
+      stage.style.height = H + "px";
+      stage.style.transformOrigin = "0 0";
+      stage.style.transform = "none";
+    }
+    resize();
+    draw();
+  }
+
+  // 尽力请求浏览器全屏（部分 Kindle 浏览器不支持时会静默失败）
+  function goFullscreen(){
+    var el = document.documentElement;
+    var fn = el.requestFullscreen || el.webkitRequestFullscreen ||
+             el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (fn) { try { fn.call(el); } catch (e) {} }
+    if (window.screen && screen.orientation && screen.orientation.lock) {
+      try { screen.orientation.lock("landscape"); } catch (e) {}
+    }
+  }
+
+  function draw(){
+    var W = cv.clientWidth, H = cv.clientHeight, i, d;
+    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+    if (!candles.length) return;
+
+    // 无价格轴 / 无时间轴，K线铺满整个屏幕
+    var padL = 4, padR = 4, padT = 10, padB = 8;
+    var cw = W - padL - padR, ch = H - padT - padB, n = candles.length;
+
+    var hi = -Infinity, lo = Infinity;
+    for (i = 0; i < n; i++) { d = candles[i]; if (d.h > hi) hi = d.h; if (d.l < lo) lo = d.l; }
+    var ema = calcEMA(candles);
+    for (i = 0; i < ema.length; i++) { if (ema[i] > hi) hi = ema[i]; if (ema[i] < lo) lo = ema[i]; }
+    var pad = (hi - lo) * 0.04 || 1; hi += pad; lo -= pad;
+    var span = hi - lo, slot = cw / n;
+    function x2(i){ return padL + (i + 0.5) * slot; }
+    function y2(p){ return padT + (hi - p) / span * ch; }
+    var bw = Math.max(1, slot * 0.6);
+
+    // EMA20（灰线，先画 => 处于 K 线下层）
+    ctx.strokeStyle = "#888"; ctx.lineWidth = 1.4; ctx.beginPath();
+    for (i = 0; i < n; i++) {
+      var xx = x2(i), yy = y2(ema[i]);
+      if (i) ctx.lineTo(xx, yy); else ctx.moveTo(xx, yy);
+    }
+    ctx.stroke();
+
+    // 影线（涨绿跌红）
+    ctx.lineWidth = 1;
+    for (i = 0; i < n; i++) {
+      d = candles[i]; var x = Math.round(x2(i)) + 0.5;
+      ctx.strokeStyle = (d.c >= d.o) ? COLOR_UP : COLOR_DOWN;
+      ctx.beginPath();
+      ctx.moveTo(x, y2(d.h)); ctx.lineTo(x, y2(d.l));
+      ctx.stroke();
+    }
+
+    // 下跌：实心红
+    ctx.fillStyle = COLOR_DOWN;
+    for (i = 0; i < n; i++) {
+      d = candles[i]; if (d.c >= d.o) continue;
+      var yo = y2(d.o), yc = y2(d.c);
+      ctx.fillRect(x2(i) - bw / 2, Math.min(yo, yc), bw, Math.max(1, Math.abs(yc - yo)));
+    }
+    // 上涨：实心绿
+    ctx.fillStyle = COLOR_UP;
+    for (i = 0; i < n; i++) {
+      d = candles[i]; if (d.c < d.o) continue;
+      var yo2 = y2(d.o), yc2 = y2(d.c);
+      var top = Math.min(yo2, yc2), bh = Math.max(1, Math.abs(yc2 - yo2));
+      ctx.fillRect(x2(i) - bw / 2, top, bw, bh);
+    }
+
+  }
+
+  // 增量合并：只拉最新几根，覆盖未收盘那根或追加新K线
+  function merge(base, fresh){
+    if (!fresh.length) return base;
+    var arr = base.slice(), i, f;
+    for (i = 0; i < fresh.length; i++) {
+      f = fresh[i];
+      if (arr.length && arr[arr.length - 1].t === f.t) arr[arr.length - 1] = f;
+      else if (!arr.length || f.t > arr[arr.length - 1].t) {
+        arr.push(f); if (arr.length > BARS) arr.shift();
+      }
+    }
+    return arr;
+  }
+
+  function refreshLatest(){
+    if (document.hidden || !candles.length) return;
+    var coin = symbols[idx];
+    var token = reqToken;
+    fetchCandles(coin, 3, function(err, fresh){
+      if (token !== reqToken) return;
+      if (err || !fresh || !fresh.length) return;
+      candles = merge(candles, fresh);
+      saveCache(coin, candles);
+      draw();
+    });
+  }
+
+  function tickCountdown(){
+    var ms = INTERVAL_MS - ((new Date()).getTime() % INTERVAL_MS);
+    var mins = Math.max(1, Math.ceil(ms / 60000));
+    elMeta.textContent = (idx + 1) + "/" + symbols.length + " · 距收盘 " + mins + " 分";
+  }
+
+  function load(){
+    var coin = symbols[idx];
+    elSym.textContent = coin.replace("xyz:", "");
+    var token = ++reqToken;
+
+    // 先用缓存即时渲染：翻页不再每次全量重拉
+    var cached = getCache(coin);
+    if (cached && cached.length) {
+      candles = cached.slice();
+      elMsg.style.display = "none";
+      draw();
+      tickCountdown();
+      var lastT = candles[candles.length - 1].t;
+      if ((new Date()).getTime() - lastT > 5 * INTERVAL_MS) {
+        // 缓存过旧：后台静默全量刷新
+        fetchCandles(coin, BARS, function(err, data){
+          if (token !== reqToken) return;
+          if (err || !data || !data.length) return;
+          candles = data; saveCache(coin, candles); draw(); tickCountdown();
+        });
+      } else {
+        refreshLatest(); // 仅增量拉取最新几根
+      }
+      return;
+    }
+
+    elMsg.style.display = "block"; elMsg.textContent = "加载中…";
+    fetchCandles(coin, BARS, function(err, data){
+      if (token !== reqToken) return;
+      if (err) { elMsg.textContent = "加载失败: " + err.message; elMsg.style.display = "block"; return; }
+      candles = data;
+      saveCache(coin, candles);
+      elMsg.style.display = "none";
+      draw();
+      tickCountdown();
+    });
+  }
+
+  function go(step){
+    idx = (idx + step + symbols.length) % symbols.length;
+    load();
+  }
+
+  // ====== 点击左侧：上一个；点击右侧：下一个 ======
+  function tapXY(e){
+    var x = (e.clientX != null) ? e.clientX : (e.pageX != null ? e.pageX : 0);
+    var y = (e.clientY != null) ? e.clientY : (e.pageY != null ? e.pageY : 0);
+    if (x === 0 && y === 0 && e.changedTouches && e.changedTouches.length) {
+      x = e.changedTouches[0].clientX; y = e.changedTouches[0].clientY;
+    }
+    return { x: x, y: y };
+  }
+  function onTap(p){
+    // 旋转成横屏后，视觉“左/右”对应物理 Y 轴
+    var prev = rotated ? (p.y > window.innerHeight / 2) : (p.x < window.innerWidth / 2);
+    if (prev) go(-1); else go(1);
+  }
+  document.addEventListener("click", function(e){
+    goFullscreen();
+    onTap(tapXY(e));
+  }, false);
+  // 桌面测试：方向键
+  window.addEventListener("keydown", function(e){
+    var k = e.keyCode || e.which;
+    if (k === 37 || k === 38) go(-1);
+    if (k === 39 || k === 40) go(1);
+  }, false);
+
+  var rt;
+  window.addEventListener("resize", function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){ layout(); }, 150);
+  }, false);
+  window.addEventListener("orientationchange", function(){
+    setTimeout(layout, 200);
+  }, false);
+
+  document.addEventListener("visibilitychange", function(){
+    if (!document.hidden) { refreshLatest(); tickCountdown(); }
+  }, false);
+
+  layout();
+  load();
+  tickCountdown();
+  // 尝试隐藏部分浏览器的地址栏
+  setTimeout(function(){ window.scrollTo(0, 1); }, 300);
+  // 每分钟刷新一次（同时更新倒计时），对电子墨水屏友好
+  setInterval(function(){ refreshLatest(); tickCountdown(); }, 60 * 1000);
+})();
+</script>
+</body>
+</html>
