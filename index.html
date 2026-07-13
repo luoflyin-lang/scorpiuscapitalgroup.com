@@ -213,17 +213,15 @@
     return out;
   }
 
-  function resize(){
-    var dpr = window.devicePixelRatio || 1;
-    var w = cv.clientWidth, h = cv.clientHeight;
-    cv.width = Math.round(w * dpr);
-    cv.height = Math.round(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  // 纵屏设备上强制旋转为横屏（手持 Kindle 横着看）
-  function layout(){
+  var lastW = 0, lastH = 0;
+  // 测量并把 stage / canvas 尺寸同步到当前视口（本函数不负责绘制）。
+  // Kindle 浏览器在隐藏地址栏、进入全屏或旋转后视口会变化，且经常不派发 resize
+  // 事件。如果不在每次绘制前重新测量，canvas 的 backing store 会残留旧的（偏矮的）
+  // 尺寸，导致这一次绘制的 K 线被纵向压扁——这正是“部分品种是扁的”的根因。
+  function measure(){
     var W = window.innerWidth, H = window.innerHeight;
+    var changed = (W !== lastW || H !== lastH);
+    lastW = W; lastH = H;
     if (H > W) {
       rotated = true;
       stage.style.width = H + "px";
@@ -237,7 +235,18 @@
       stage.style.transformOrigin = "0 0";
       stage.style.transform = "none";
     }
-    resize();
+    // 读取 clientWidth/Height 会强制同步重排，拿到的就是刚设置后的最新尺寸
+    var dpr = window.devicePixelRatio || 1;
+    var cw = cv.clientWidth, chh = cv.clientHeight;
+    var bw = Math.round(cw * dpr), bh = Math.round(chh * dpr);
+    if (cv.width !== bw || cv.height !== bh) { cv.width = bw; cv.height = bh; }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return changed;
+  }
+
+  // 纵屏设备上强制旋转为横屏（手持 Kindle 横着看）
+  function layout(){
+    measure();
     draw();
   }
 
@@ -253,6 +262,7 @@
   }
 
   function draw(){
+    measure(); // 每次绘制前重新同步尺寸，保证 Kindle 与电脑看到的比例一致
     var W = cv.clientWidth, H = cv.clientHeight, i, d;
     ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
     if (!candles.length) return;
@@ -427,6 +437,11 @@
   document.addEventListener("visibilitychange", function(){
     if (!document.hidden) { refreshLatest(); tickCountdown(); }
   }, false);
+
+  // Kindle 视口变化常常不触发 resize 事件：轮询检测尺寸变化，变了才重绘（避免墨水屏无谓刷新）
+  setInterval(function(){ if (measure()) draw(); }, 800);
+  document.addEventListener("fullscreenchange", function(){ layout(); }, false);
+  document.addEventListener("webkitfullscreenchange", function(){ layout(); }, false);
 
   // 首次启动：先拉取符合 OI 条件的品种列表，再加载第一个品种的 K 线
   function bootstrap(){
