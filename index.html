@@ -56,7 +56,7 @@
   var COLOR_DOWN = "#000"; // 下跌：黑（实心）
 
   // ====== 本地缓存：翻页/重开时即时复用，减少拉取次数 ======
-  function cacheKey(coin){ return "kline:" + INTERVAL + ":" + BARS + ":" + coin; }
+  function cacheKey(coin){ return "kline:v2:" + INTERVAL + ":" + BARS + ":" + coin; }
   function saveCache(coin, arr){
     cache[coin] = arr;
     try { localStorage.setItem(cacheKey(coin), JSON.stringify({ t: (new Date()).getTime(), bars: arr })); } catch (e) {}
@@ -65,7 +65,7 @@
     if (cache[coin]) return cache[coin];
     try {
       var raw = localStorage.getItem(cacheKey(coin));
-      if (raw) { var o = JSON.parse(raw); if (o && o.bars && o.bars.length) { cache[coin] = o.bars; return o.bars; } }
+      if (raw) { var o = JSON.parse(raw); if (o && o.bars && o.bars.length) { var b = sanitize(o.bars); if (b.length) { cache[coin] = b; return b; } } }
     } catch (e) {}
     return null;
   }
@@ -87,7 +87,7 @@
 
   // ====== 拉取 Hyperliquid「全部永续 dex」（主 dex + xyz 等 builder 部署的股票/商品 dex）======
   // 官网显示的品种 = 主 dex 的加密永续 + builder 部署的永续(股票/商品/外汇，带 xyz 标记)。
-  // 之前只拉了主 dex，漏掉 builder dex，导致品种少了一半。这里自动发现所有 dex 并合并。
+  // 之前只拉了主 dex，漏掉 builder dex，导致品种少了��半。这里自动发现所有 dex 并合并。
 
   // 通用 POST 封装
   function hlPost(body, cb){
@@ -175,6 +175,21 @@
     });
   }
 
+  // 只剔除“不可能是真实价格”的损坏值（NaN/Infinity/<=0）；绝不因价格高/低而丢弃或改动真实 K 线
+  function isPos(v){ return isFinite(v) && v > 0; }
+  function sanitize(arr){
+    if (!arr || !arr.length) return arr || [];
+    var out = [], i;
+    for (i = 0; i < arr.length; i++) {
+      var o = +arr[i].o, h = +arr[i].h, l = +arr[i].l, cc = +arr[i].c, t = arr[i].t;
+  // 只剔除“不可能是真实价格”的损坏值（NaN/Infinity/<=0）；绝不因价格高/低而丢弃或改动真实 K 线
+      if (!(isPos(o) && isPos(h) && isPos(l) && isPos(cc))) continue;
+      // 仅做 OHLC 一致性校正（high取最高、low取最低），不新增/编造任何价格
+      out.push({ t: t, o: o, h: Math.max(o, h, l, cc), l: Math.min(o, h, l, cc), c: cc });
+    }
+    return out;
+  }
+
   function fetchCandles(coin, bars, cb){
     var end = (new Date()).getTime();
     var start = end - bars * INTERVAL_MS;
@@ -191,7 +206,7 @@
             d = data[i];
             out.push({ t: d.t, o: +d.o, h: +d.h, l: +d.l, c: +d.c });
           }
-          cb(null, out);
+          cb(null, sanitize(out));
         } catch (e) { cb(e); }
       } else {
         cb(new Error("HTTP " + xhr.status));
@@ -272,10 +287,16 @@
     var padL = 4, padR = 4, padT = 10, padB = 8;
     var cw = W - padL - padR, ch = H - padT - padB, n = candles.length;
 
-    var hi = -Infinity, lo = Infinity;
-    for (i = 0; i < n; i++) { d = candles[i]; if (d.h > hi) hi = d.h; if (d.l < lo) lo = d.l; }
     var ema = calcEMA(candles);
-    for (i = 0; i < ema.length; i++) { if (ema[i] > hi) hi = ema[i]; if (ema[i] < lo) lo = ema[i]; }
+    // 稳健纵轴：用分位数取范围，个别脏数据/异常插针不会把区间撑到几千%
+    var His = [], Los = [];
+    for (i = 0; i < n; i++) { His.push(candles[i].h); Los.push(candles[i].l); }
+    His.sort(function(a, b){ return a - b; });
+    Los.sort(function(a, b){ return a - b; });
+    function pctl(a, p){ var k = (a.length - 1) * p, f = Math.floor(k), cix = Math.min(f + 1, a.length - 1); return a[f] + (a[cix] - a[f]) * (k - f); }
+    var hi = pctl(His, 0.99), lo = pctl(Los, 0.01);
+    for (i = 0; i < ema.length; i++) { if (isFinite(ema[i])) { if (ema[i] > hi) hi = ema[i]; if (ema[i] < lo) lo = ema[i]; } }
+    if (!(hi > lo)) { hi = lo + (Math.abs(lo) * 0.01 || 1); }
     var pad = (hi - lo) * 0.04 || 1; hi += pad; lo -= pad;
     var span = hi - lo, slot = cw / n;
     var _dbg = document.getElementById("dbg");
