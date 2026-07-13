@@ -29,6 +29,7 @@
 <canvas id="cv"></canvas>
 <div id="info"><div id="sym"></div><div id="meta"></div></div>
 <div id="msg">加载中…</div>
+<div id="dbg" style="position:absolute;left:6px;bottom:6px;font-size:11px;line-height:1.3;color:#000;background:rgba(255,255,255,0.9);font-family:monospace;padding:2px 4px;pointer-events:none;z-index:99999;white-space:nowrap;"></div>
 </div>
 <script>
 (function(){
@@ -277,6 +278,13 @@
     for (i = 0; i < ema.length; i++) { if (ema[i] > hi) hi = ema[i]; if (ema[i] < lo) lo = ema[i]; }
     var pad = (hi - lo) * 0.04 || 1; hi += pad; lo -= pad;
     var span = hi - lo, slot = cw / n;
+    var _dbg = document.getElementById("dbg");
+    if (_dbg) {
+      _dbg.textContent = (symbols[idx] || "") + " | dpr" + (window.devicePixelRatio || 1)
+        + " | cv" + cv.width + "x" + cv.height
+        + " | css" + cv.clientWidth + "x" + cv.clientHeight
+        + " | n" + n + " | span" + (span / (lo || 1) * 100).toFixed(1) + "% | rot" + (rotated ? 1 : 0);
+    }
     function x2(i){ return padL + (i + 0.5) * slot; }
     function y2(p){ return padT + (hi - p) / span * ch; }
     var bw = Math.max(1, slot * 0.6);
