@@ -369,6 +369,9 @@
       return;
     }
 
+    // 无缓存：先清空画布，避免加载期间残留上一个品种的 K 线
+    candles = [];
+    draw();
     elMsg.style.display = "block"; elMsg.textContent = "加载中…";
     fetchCandles(coin, BARS, function(err, data){
       if (token !== reqToken) return;
