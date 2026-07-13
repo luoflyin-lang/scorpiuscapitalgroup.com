@@ -9,19 +9,19 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body {
-    height:100%; width:100%; background:#000; color:#fff; overflow:hidden;
+    height:100%; width:100%; background:#fff; color:#000; overflow:hidden;
     font-family:Helvetica,Arial,sans-serif;
     -webkit-user-select:none; user-select:none;
     -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent;
   }
-  #stage { position:absolute; top:0; left:0; background:#000; overflow:hidden; }
+  #stage { position:absolute; top:0; left:0; background:#fff; overflow:hidden; }
   #cv { display:block; width:100%; height:100%; touch-action:none; }
   #info { position:absolute; right:10px; top:8px; line-height:1.2; text-align:right; pointer-events:none; }
   #sym { font-size:24px; font-weight:bold; letter-spacing:.5px; }
   #meta { font-size:13px; font-variant-numeric:tabular-nums; }
   #msg { position:absolute; left:50%; top:50%;
     -webkit-transform:translate(-50%,-50%); transform:translate(-50%,-50%);
-    font-size:16px; color:#fff; }
+    font-size:16px; color:#000; }
 </style>
 </head>
 <body>
@@ -51,8 +51,8 @@
   var candles = [];
   var reqToken = 0;
   var cache = {};
-  var COLOR_UP = "#0ecb81";   // 上涨：绿
-  var COLOR_DOWN = "#f6465d"; // 下跌：红
+  var COLOR_UP = "#000";   // 上涨：黑（空心）
+  var COLOR_DOWN = "#000"; // 下跌：黑（实心）
 
   // ====== 本地缓存：翻页/重开时即时复用，减少拉取次数 ======
   function cacheKey(coin){ return "kline:" + INTERVAL + ":" + BARS + ":" + coin; }
@@ -254,7 +254,7 @@
 
   function draw(){
     var W = cv.clientWidth, H = cv.clientHeight, i, d;
-    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
     if (!candles.length) return;
 
     // 无价格�� / 无时间轴，K线铺满整个屏幕
@@ -272,7 +272,7 @@
     var bw = Math.max(1, slot * 0.6);
 
     // EMA20（灰线，先画 => 处于 K 线下层）
-    ctx.strokeStyle = "#888"; ctx.lineWidth = 1.4; ctx.beginPath();
+    ctx.strokeStyle = "#999"; ctx.lineWidth = 1.4; ctx.beginPath();
     for (i = 0; i < n; i++) {
       var xx = x2(i), yy = y2(ema[i]);
       if (i) ctx.lineTo(xx, yy); else ctx.moveTo(xx, yy);
@@ -296,13 +296,15 @@
       var yo = y2(d.o), yc = y2(d.c);
       ctx.fillRect(x2(i) - bw / 2, Math.min(yo, yc), bw, Math.max(1, Math.abs(yc - yo)));
     }
-    // 上涨：实心绿
-    ctx.fillStyle = COLOR_UP;
+    // 上涨：空心（白底黑框）
+    ctx.strokeStyle = COLOR_UP; ctx.lineWidth = 1;
     for (i = 0; i < n; i++) {
       d = candles[i]; if (d.c < d.o) continue;
       var yo2 = y2(d.o), yc2 = y2(d.c);
       var top = Math.min(yo2, yc2), bh = Math.max(1, Math.abs(yc2 - yo2));
-      ctx.fillRect(x2(i) - bw / 2, top, bw, bh);
+      var bx = Math.round(x2(i) - bw / 2) + 0.5;
+      ctx.fillStyle = "#fff"; ctx.fillRect(bx, top, bw, bh);
+      ctx.strokeRect(bx, top, bw, bh);
     }
 
   }
